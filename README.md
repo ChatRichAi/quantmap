@@ -6,6 +6,34 @@
 
 ---
 
+## 一键部署
+
+```bash
+# 克隆并安装（自动完成全部依赖 + 生成启动脚本）
+git clone https://github.com/ChatRichAi/quantmap.git && cd quantmap && bash install.sh
+```
+
+安装完成后：
+
+```bash
+bash quantmap.sh start    # 启动全部服务（API + Agents + UI）
+bash quantmap.sh stop     # 停止
+bash quantmap.sh status   # 查看状态
+bash quantmap.sh logs     # 查看日志 (api|evolver|miner|ui)
+```
+
+| 服务 | 地址 |
+|------|------|
+| API 文档 | http://localhost:8889/docs |
+| EvoMap UI | http://localhost:3000 |
+
+**前置要求**: Python 3.8+ · Node.js 18+ · Git
+
+> 自定义端口：`bash install.sh --port-api 8890 --port-ui 3001`
+> 仅后端不装前端：`bash install.sh --no-ui`
+
+---
+
 ## 项目概览
 
 QuantMap 是一个基于 **QEP 协议（Quant Evolution Protocol）** 的分布式量化策略进化网络。它将基因表达式编程（GEP）与多 Agent 协作机制结合，实现策略的自动发现、回测验证、赏金激励和持续进化。

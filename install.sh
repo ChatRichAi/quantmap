@@ -1,0 +1,306 @@
+#!/usr/bin/env bash
+# ============================================================
+#  QuantMap — One-command installer
+#  Usage:  bash install.sh [--no-ui] [--port-api 8889] [--port-ui 3000]
+# ============================================================
+set -euo pipefail
+
+# ── Colors ──────────────────────────────────────────────────
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
+BLUE='\033[0;34m'; CYAN='\033[0;36m'; BOLD='\033[1m'; RESET='\033[0m'
+
+ok()   { echo -e "${GREEN}✓${RESET} $*"; }
+info() { echo -e "${CYAN}→${RESET} $*"; }
+warn() { echo -e "${YELLOW}!${RESET} $*"; }
+fail() { echo -e "${RED}✗ $*${RESET}"; exit 1; }
+step() { echo -e "\n${BOLD}${BLUE}[$1]${RESET} $2"; }
+
+# ── Banner ───────────────────────────────────────────────────
+echo -e "${BOLD}${CYAN}"
+cat << 'EOF'
+  ____                    _   __  __
+ / __ \ _   _  __ _ _ __ | |_|  \/  | __ _ _ __
+| |  | | | | |/ _` | '_ \| __| |\/| |/ _` | '_ \
+| |__| | |_| | (_| | | | | |_| |  | | (_| | |_) |
+ \___\_\\__,_|\__,_|_| |_|\__|_|  |_|\__,_| .__/
+                                            |_|
+  Quantitative Strategy Evolution Network
+EOF
+echo -e "${RESET}"
+
+# ── Defaults ─────────────────────────────────────────────────
+INSTALL_UI=true
+API_PORT=8889
+UI_PORT=3000
+REPO_URL="https://github.com/ChatRichAi/quantmap.git"
+INSTALL_DIR="${QUANTMAP_DIR:-$HOME/quantmap}"
+
+# ── Parse args ───────────────────────────────────────────────
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --no-ui)       INSTALL_UI=false ;;
+    --port-api)    API_PORT="$2"; shift ;;
+    --port-ui)     UI_PORT="$2"; shift ;;
+    --dir)         INSTALL_DIR="$2"; shift ;;
+    -h|--help)
+      echo "Usage: bash install.sh [options]"
+      echo "  --no-ui          Skip frontend install"
+      echo "  --port-api PORT  API server port (default: 8889)"
+      echo "  --port-ui  PORT  UI dev server port (default: 3000)"
+      echo "  --dir PATH       Install directory (default: ~/quantmap)"
+      exit 0 ;;
+    *) warn "Unknown option: $1" ;;
+  esac
+  shift
+done
+
+# ── Step 1: System requirements ──────────────────────────────
+step "1/6" "Checking system requirements"
+
+# Python
+if command -v python3 &>/dev/null; then
+  PY_VER=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+  ok "Python $PY_VER"
+else
+  fail "Python 3.8+ required. Install: https://python.org"
+fi
+
+# Node.js
+if command -v node &>/dev/null; then
+  NODE_VER=$(node --version)
+  ok "Node.js $NODE_VER"
+else
+  fail "Node.js 18+ required. Install: https://nodejs.org"
+fi
+
+# Git
+command -v git &>/dev/null && ok "git" || fail "git required"
+
+# pip
+if ! python3 -m pip --version &>/dev/null; then
+  warn "pip not found, trying to install..."
+  python3 -m ensurepip --upgrade || fail "pip install failed"
+fi
+
+# ── Step 2: Clone repo ───────────────────────────────────────
+step "2/6" "Cloning QuantMap"
+
+if [[ -d "$INSTALL_DIR/.git" ]]; then
+  info "Directory exists, pulling latest..."
+  git -C "$INSTALL_DIR" pull --ff-only
+  ok "Updated to latest"
+else
+  info "Cloning to $INSTALL_DIR ..."
+  git clone "$REPO_URL" "$INSTALL_DIR"
+  ok "Cloned"
+fi
+
+QUANTCLAW_DIR="$INSTALL_DIR/workspace/quantclaw"
+QUANTMAP_DIR="$INSTALL_DIR/workspace/quantmap"
+UI_DIR="$INSTALL_DIR/quant-evomap-ui/quant-evomap-ui"
+
+# ── Step 3: Python deps ──────────────────────────────────────
+step "3/6" "Installing Python dependencies"
+
+# Create virtual environment
+VENV_DIR="$INSTALL_DIR/.venv"
+if [[ ! -d "$VENV_DIR" ]]; then
+  info "Creating virtual environment..."
+  python3 -m venv "$VENV_DIR"
+fi
+
+# Activate
+# shellcheck disable=SC1090
+source "$VENV_DIR/bin/activate"
+ok "Virtual environment: $VENV_DIR"
+
+info "Installing packages..."
+pip install --quiet --upgrade pip
+pip install --quiet \
+  fastapi uvicorn \
+  pandas numpy scipy \
+  requests aiohttp \
+  yfinance \
+  akshare \
+  schedule \
+  ta-lib 2>/dev/null || \
+pip install --quiet \
+  fastapi uvicorn \
+  pandas numpy scipy \
+  requests aiohttp \
+  yfinance \
+  schedule
+ok "Python packages installed"
+
+# ── Step 4: Node deps (QuantMap protocol) ────────────────────
+step "4/6" "Installing Node.js dependencies"
+
+if [[ -f "$QUANTMAP_DIR/package.json" ]]; then
+  info "Installing quantmap packages..."
+  npm install --prefix "$QUANTMAP_DIR" --silent
+  ok "QuantMap node packages"
+fi
+
+# ── Step 5: Frontend ─────────────────────────────────────────
+if [[ "$INSTALL_UI" == true ]]; then
+  step "5/6" "Installing frontend (quant-evomap-ui)"
+  if [[ -d "$UI_DIR" ]]; then
+    info "npm install..."
+    npm install --prefix "$UI_DIR" --silent
+    ok "Frontend packages installed"
+  else
+    warn "UI directory not found, skipping"
+  fi
+else
+  step "5/6" "Skipping frontend (--no-ui)"
+fi
+
+# ── Step 6: Generate launch scripts ──────────────────────────
+step "6/6" "Generating launch scripts"
+
+LAUNCH_SCRIPT="$INSTALL_DIR/quantmap.sh"
+
+cat > "$LAUNCH_SCRIPT" << LAUNCH
+#!/usr/bin/env bash
+# QuantMap unified launcher — generated by install.sh
+set -euo pipefail
+
+INSTALL_DIR="$INSTALL_DIR"
+QUANTCLAW_DIR="$QUANTCLAW_DIR"
+QUANTMAP_DIR="$QUANTMAP_DIR"
+UI_DIR="$UI_DIR"
+VENV="$VENV_DIR/bin/activate"
+API_PORT="${API_PORT}"
+UI_PORT="${UI_PORT}"
+LOG_DIR="\$INSTALL_DIR/logs"
+mkdir -p "\$LOG_DIR"
+
+RED='\033[0;31m'; GREEN='\033[0;32m'; CYAN='\033[0;36m'; BOLD='\033[1m'; RESET='\033[0m'
+ok()   { echo -e "\${GREEN}✓\${RESET} \$*"; }
+info() { echo -e "\${CYAN}→\${RESET} \$*"; }
+
+CMD="\${1:-start}"
+
+case "\$CMD" in
+
+  start)
+    echo -e "\n\${BOLD}Starting QuantMap...\${RESET}"
+
+    # Activate venv
+    # shellcheck disable=SC1090
+    source "\$VENV"
+
+    # API server
+    info "Starting QuantClaw API (:${API_PORT})..."
+    if lsof -i ":\${API_PORT}" >/dev/null 2>&1; then
+      ok "API already running on :\${API_PORT}"
+    else
+      python3 -m uvicorn api_server:app \\
+        --host 0.0.0.0 --port "\${API_PORT}" \\
+        --app-dir "\$QUANTCLAW_DIR" \\
+        >> "\$LOG_DIR/api.log" 2>&1 &
+      echo \$! > "\$QUANTCLAW_DIR/api_server.pid"
+      sleep 2
+      ok "API server started (pid=\$(cat \$QUANTCLAW_DIR/api_server.pid))"
+    fi
+
+    # Evolver daemon
+    info "Starting evolver daemon..."
+    python3 "\$QUANTCLAW_DIR/evolver_daemon.py" start \\
+      --db-path "\$QUANTCLAW_DIR/evolution_hub.db" >> "\$LOG_DIR/evolver.log" 2>&1 || true
+    ok "Evolver daemon started"
+
+    # Agents
+    for AGENT in miner validator optimizer; do
+      PID_FILE="\$QUANTCLAW_DIR/agent_\${AGENT}.pid"
+      if [[ -f "\$PID_FILE" ]] && kill -0 "\$(cat \$PID_FILE)" 2>/dev/null; then
+        ok "\$AGENT already running"
+      else
+        python3 "\$QUANTCLAW_DIR/agents/\${AGENT}_agent.py" \\
+          --agent-id "\${AGENT}_01" \\
+          --api-base "http://127.0.0.1:\${API_PORT}/api/v1" \\
+          >> "\$LOG_DIR/\${AGENT}.log" 2>&1 &
+        echo \$! > "\$PID_FILE"
+        ok "\$AGENT agent started"
+      fi
+    done
+
+    # Frontend
+    if [[ -d "\$UI_DIR/node_modules" ]]; then
+      info "Starting EvoMap UI (:${UI_PORT})..."
+      npm run --prefix "\$UI_DIR" start -- -p "\${UI_PORT}" \\
+        >> "\$LOG_DIR/ui.log" 2>&1 &
+      echo \$! > "\$INSTALL_DIR/ui.pid"
+      ok "UI started (pid=\$(cat \$INSTALL_DIR/ui.pid))"
+    fi
+
+    echo ""
+    echo -e "\${BOLD}QuantMap running!\${RESET}"
+    echo -e "  API  → http://localhost:\${API_PORT}/docs"
+    echo -e "  UI   → http://localhost:\${UI_PORT}"
+    echo -e "  Logs → \$LOG_DIR/"
+    echo -e "  Stop → bash quantmap.sh stop"
+    ;;
+
+  stop)
+    echo -e "\n\${BOLD}Stopping QuantMap...\${RESET}"
+    bash "\$QUANTCLAW_DIR/stop_quant_evomap.sh" || true
+    if [[ -f "\$INSTALL_DIR/ui.pid" ]]; then
+      kill "\$(cat \$INSTALL_DIR/ui.pid)" 2>/dev/null && ok "UI stopped" || true
+      rm -f "\$INSTALL_DIR/ui.pid"
+    fi
+    ok "All services stopped"
+    ;;
+
+  status)
+    bash "\$QUANTCLAW_DIR/status_quant_evomap.sh"
+    ;;
+
+  ui)
+    # Dev mode UI with hot reload
+    source "\$VENV"
+    info "Starting UI in dev mode (:${UI_PORT})..."
+    npm run --prefix "\$UI_DIR" dev -- -p "\${UI_PORT}"
+    ;;
+
+  evolve)
+    # Run one evolution cycle
+    source "\$VENV"
+    info "Running evolution cycle..."
+    node "\$QUANTMAP_DIR/index.js" evolve
+    ;;
+
+  logs)
+    SVCLOG="\${2:-api}"
+    tail -f "\$LOG_DIR/\${SVCLOG}.log"
+    ;;
+
+  *)
+    echo "Usage: bash quantmap.sh [command]"
+    echo ""
+    echo "Commands:"
+    echo "  start    Start all services (API + agents + UI)"
+    echo "  stop     Stop all services"
+    echo "  status   Show service status"
+    echo "  ui       Start UI in dev mode (hot reload)"
+    echo "  evolve   Run one strategy evolution cycle"
+    echo "  logs     Tail logs (api|evolver|miner|ui)"
+    ;;
+esac
+LAUNCH
+
+chmod +x "$LAUNCH_SCRIPT"
+ok "Launch script: $LAUNCH_SCRIPT"
+
+# ── Done ─────────────────────────────────────────────────────
+echo ""
+echo -e "${BOLD}${GREEN}Installation complete!${RESET}"
+echo ""
+echo -e "  ${BOLD}Start:${RESET}  bash $LAUNCH_SCRIPT start"
+echo -e "  ${BOLD}Stop:${RESET}   bash $LAUNCH_SCRIPT stop"
+echo -e "  ${BOLD}Status:${RESET} bash $LAUNCH_SCRIPT status"
+echo -e "  ${BOLD}Logs:${RESET}   bash $LAUNCH_SCRIPT logs [api|evolver|miner|ui]"
+echo ""
+echo -e "  API docs → ${CYAN}http://localhost:${API_PORT}/docs${RESET}"
+echo -e "  EvoMap  → ${CYAN}http://localhost:${UI_PORT}${RESET}"
+echo ""
