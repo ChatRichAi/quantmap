@@ -1,0 +1,27 @@
+{
+  "name": "quantmap",
+  "version": "0.1.0",
+  "description": "Quantitative Strategy Evolution Network - A distributed evolution network for trading strategies based on EvoMap architecture",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "evolve": "node index.js evolve",
+    "loop": "node index.js --loop",
+    "validate": "node scripts/validate.js"
+  },
+  "keywords": [
+    "quantitative",
+    "trading",
+    "strategy",
+    "evolution",
+    "genetic",
+    "backtest",
+    "bounty"
+  ],
+  "author": "QuantClaw",
+  "license": "MIT",
+  "dependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

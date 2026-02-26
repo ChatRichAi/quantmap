@@ -1,0 +1,56 @@
+version: 1
+profile:
+  name: quantclaw
+  timezone: Asia/Shanghai
+  language: zh-CN
+
+risk:
+  mode: strict
+  max_position_per_asset: 0.25
+  max_single_market_exposure: 0.50
+  min_cash_ratio: 0.08
+  max_daily_drawdown: 0.03
+  max_portfolio_drawdown: 0.12
+
+markets:
+  a_share:
+    enabled: true
+    session: "09:15-15:00"
+    data_source: akshare
+  us_stock:
+    enabled: true
+    session_winter: "22:30-05:00"
+    session_summer: "21:30-04:00"
+    data_source: yfinance
+  crypto:
+    enabled: true
+    session: "24x7"
+    data_source: okx
+  metals:
+    enabled: true
+    checkpoints:
+      - "09:00"
+      - "21:00"
+
+strategy_scheduler:
+  enabled: true
+  source: "/Users/oneday/.openclaw/cron/jobs.json"
+
+memory:
+  root: "/Users/oneday/.openclaw/workspace/memory"
+  auto_capture: true
+  labels:
+    - trade-record
+    - strategy-performance
+    - market-observation
+    - risk-event
+    - rebalance-action
+    - research-finding
+
+notifications:
+  channels:
+    - whatsapp
+    - telegram
+    - discord
+  format: quant-brief
+  include_risk_section: true

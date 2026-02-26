@@ -1,0 +1,146 @@
+{
+  "date": "2026-02-25",
+  "timestamp": "2026-02-26T05:01:34.422607",
+  "data": {
+    "SPY": {
+      "close": 693.02,
+      "prev_close": 687.35,
+      "change_pct": 0.82,
+      "volume": 50559941,
+      "high": 693.68,
+      "low": 690.1
+    },
+    "QQQ": {
+      "close": 616.42,
+      "prev_close": 607.87,
+      "change_pct": 1.41,
+      "volume": 51271420,
+      "high": 616.83,
+      "low": 611.0
+    },
+    "NVDA": {
+      "close": 195.62,
+      "prev_close": 192.85,
+      "change_pct": 1.44,
+      "volume": 196523805,
+      "high": 197.63,
+      "low": 193.8
+    },
+    "TSLA": {
+      "close": 417.33,
+      "prev_close": 409.38,
+      "change_pct": 1.94,
+      "volume": 52199174,
+      "high": 420.34,
+      "low": 412.15
+    },
+    "AMD": {
+      "close": 210.86,
+      "prev_close": 213.84,
+      "change_pct": -1.39,
+      "volume": 42266872,
+      "high": 216.7,
+      "low": 210.33
+    },
+    "BABA": {
+      "close": 152.3,
+      "prev_close": 153.11,
+      "change_pct": -0.53,
+      "volume": 5491368,
+      "high": 153.54,
+      "low": 150.96
+    },
+    "AAPL": {
+      "close": 274.24,
+      "prev_close": 272.14,
+      "change_pct": 0.77,
+      "volume": 29337558,
+      "high": 274.94,
+      "low": 271.05
+    },
+    "MSFT": {
+      "close": 400.64,
+      "prev_close": 389.0,
+      "change_pct": 2.99,
+      "volume": 40589845,
+      "high": 401.47,
+      "low": 390.2
+    },
+    "GOOGL": {
+      "close": 312.96,
+      "prev_close": 310.9,
+      "change_pct": 0.66,
+      "volume": 26927431,
+      "high": 313.64,
+      "low": 309.44
+    },
+    "AMZN": {
+      "close": 210.64,
+      "prev_close": 208.56,
+      "change_pct": 1.0,
+      "volume": 39230435,
+      "high": 211.59,
+      "low": 208.93
+    },
+    "META": {
+      "close": 653.69,
+      "prev_close": 639.3,
+      "change_pct": 2.25,
+      "volume": 10752144,
+      "high": 653.88,
+      "low": 642.15
+    }
+  },
+  "summary": {
+    "gainers": [
+      [
+        "QQQ",
+        1.4065487458910437
+      ],
+      [
+        "NVDA",
+        1.438938972599694
+      ],
+      [
+        "TSLA",
+        1.9419565183035392
+      ],
+      [
+        "MSFT",
+        2.991005081137532
+      ],
+      [
+        "META",
+        2.250901755546032
+      ]
+    ],
+    "losers": [
+      [
+        "AMD",
+        -1.3935633083487071
+      ]
+    ],
+    "unchanged": [
+      [
+        "SPY",
+        0.8249136752320421
+      ],
+      [
+        "BABA",
+        -0.5290298186694588
+      ],
+      [
+        "AAPL",
+        0.7716526320652776
+      ],
+      [
+        "GOOGL",
+        0.6625917012013953
+      ],
+      [
+        "AMZN",
+        0.9973158109911862
+      ]
+    ]
+  }
+}

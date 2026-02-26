@@ -1,0 +1,69 @@
+# ===== 敏感凭证 =====
+credentials/
+.env
+*.pem
+*.key
+*.secret
+
+# ===== 数据库文件 =====
+*.db
+*.db-shm
+*.db-wal
+
+# ===== 日志 =====
+logs/
+*.log
+*.err.log
+
+# ===== 运行时 / 队列 =====
+delivery-queue/
+*.pid
+*.bak
+*.bak.*
+exec-approvals.json
+update-check.json
+mu-monitor-state.json
+openclaw.json.bak*
+
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db
+
+# ===== Python 缓存 =====
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# ===== Node =====
+node_modules/
+
+# ===== 大型数据 / 状态文件 =====
+workspace/quantclaw/mined_materials.json
+workspace/quantclaw/evolver_state.json
+workspace/quantclaw/rl_optimization_results.json
+workspace/quantclaw/self_driving_report.json
+workspace/quantclaw/ecosystem_data.json
+workspace/quantclaw/evolution_hub.db*
+workspace/quantclaw/strategy_marketplace.db
+workspace/quantclaw/backtest_results/
+workspace/quantclaw/logs/
+workspace/quantclaw/__pycache__/
+workspace/quantclaw/research/
+
+# ===== 运行时状态 =====
+media/
+subagents/
+browser/
+canvas/
+workspace/EOF
+workspace/HEARTBEAT.md
+
+# ===== 身份 / 设备 =====
+identity/
+devices/
+telegram/

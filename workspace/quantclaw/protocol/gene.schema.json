@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quantclaw.local/protocol/gene.schema.json",
+  "title": "Quant-GEP Gene",
+  "type": "object",
+  "required": [
+    "gene_id",
+    "name",
+    "formula",
+    "parameters",
+    "generation",
+    "lineage",
+    "validation",
+    "meta"
+  ],
+  "properties": {
+    "gene_id": {
+      "type": "string",
+      "minLength": 4
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "formula": {
+      "type": "string",
+      "minLength": 1
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "number",
+          "string",
+          "boolean"
+        ]
+      }
+    },
+    "generation": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "lineage": {
+      "type": "object",
+      "required": [
+        "parent_ids",
+        "mutation_type"
+      ],
+      "properties": {
+        "parent_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mutation_type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "validation": {
+      "type": "object",
+      "required": [
+        "status",
+        "sharpe_ratio",
+        "max_drawdown",
+        "win_rate",
+        "test_symbols"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "validated",
+            "rejected"
+          ]
+        },
+        "sharpe_ratio": {
+          "type": "number"
+        },
+        "max_drawdown": {
+          "type": "number"
+        },
+        "win_rate": {
+          "type": "number"
+        },
+        "test_symbols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "test_period": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "author",
+        "created_at",
+        "source"
+      ],
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "seed_discovery",
+            "crossover",
+            "mutation",
+            "paper",
+            "manual",
+            "unknown"
+          ]
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

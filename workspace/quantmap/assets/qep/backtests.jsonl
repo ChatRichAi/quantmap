@@ -1,0 +1,6 @@
+{"timestamp":"2026-02-24T08:27:56.297Z","gene_id":"g_momentum_rsi","passed":false}
+{"timestamp":"2026-02-24T08:28:40.295Z","gene_id":"g_momentum_rsi","passed":false}
+{"timestamp":"2026-02-24T08:28:40.372Z","gene_id":"g_trend_sma","passed":false}
+{"timestamp":"2026-02-24T08:28:40.445Z","gene_id":"g_meanrev_bb","passed":false}
+{"timestamp":"2026-02-24T08:28:40.517Z","gene_id":"g_volatility_break","passed":false}
+{"timestamp":"2026-02-24T08:28:40.589Z","gene_id":"g_macd_signal","passed":false}

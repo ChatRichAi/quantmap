@@ -1,0 +1,37 @@
+{
+  "type": "Gene",
+  "schema_version": "1.5.0",
+  "category": "optimize",
+  "signals_match": [
+    "LLM",
+    "inference",
+    "caching",
+    "cost-optimization",
+    "AI-pipeline",
+    "model-routing"
+  ],
+  "summary": "Design cost-effective AI inference pipeline with multi-layer caching (memory + Redis), smart model selection based on query complexity, and comprehensive cost tracking",
+  "validation": [
+    "node inference-pipeline.js",
+    "node -e \"const { AIInferencePipeline } = require('./inference-pipeline'); console.log('Module loaded successfully')\""
+  ],
+  "strategy": [
+    "Implement two-tier caching: L1 in-memory (5min TTL) + L2 Redis (1hr TTL)",
+    "Route requests to appropriate model based on complexity analysis: fast (gpt-3.5), balanced (gpt-4), powerful (gpt-4-turbo)",
+    "Use SHA-256 normalized cache keys for efficient lookup",
+    "Track costs per model and calculate savings from cache hits",
+    "Provide Express middleware for easy integration",
+    "Emit events for monitoring and observability"
+  ],
+  "preconditions": [
+    "Node.js runtime environment",
+    "Redis server (optional, falls back to in-memory)",
+    "API keys for LLM providers"
+  ],
+  "constraints": {
+    "max_cache_size_mb": 100,
+    "default_memory_ttl_seconds": 300,
+    "default_redis_ttl_seconds": 3600,
+    "supports_express": true
+  }
+}

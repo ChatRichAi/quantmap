@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantFlow Roadmap - 路线图</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.7;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 14px;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-primary);
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.12);
+        }
+
+        .nav-link.active {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 110px 30px 60px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--warning), #fcd34d, var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Progress Overview */
+        .progress-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .progress-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .progress-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--success), var(--primary), var(--warning), var(--text-secondary));
+        }
+
+        .timeline-phase {
+            position: relative;
+            margin-bottom: 50px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -40px;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .timeline-marker.completed {
+            background: var(--success);
+        }
+
+        .timeline-marker.in-progress {
+            background: var(--primary);
+            animation: pulse 2s infinite;
+        }
+
+        .timeline-marker.upcoming {
+            background: var(--warning);
+        }
+
+        .timeline-marker.future {
+            background: var(--text-secondary);
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5); }
+            50% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .phase-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .phase-date {
+            font-size: 13px;
+            padding: 4px 12px;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            color: var(--primary);
+        }
+
+        .phase-status {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .phase-status.completed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .phase-status.in-progress {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
+        .phase-status.upcoming {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .phase-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .phase-description {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        /* Milestones */
+        .milestones {
+            display: grid;
+            gap: 12px;
+        }
+
+        .milestone {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .milestone:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .milestone-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .milestone-checkbox.done {
+            background: var(--success);
+            color: white;
+        }
+
+        .milestone-checkbox.pending {
+            border: 2px solid var(--border);
+            background: transparent;
+        }
+
+        .milestone-text {
+            flex: 1;
+        }
+
+        .milestone-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .milestone-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .milestone-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
+        /* Vision Section */
+        .vision-section {
+            margin-top: 60px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(167, 139, 250, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 16px;
+        }
+
+        .vision-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .vision-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .vision-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .vision-card-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .vision-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .vision-card-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--border);
+            margin-top: 60px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .footer-links a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 32px;
+            }
+            .progress-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .vision-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">QuantFlow</div>
+            <div class="header-nav">
+                <a class="nav-link" href="/quantmap/visualization/index.html" title="QuantMap 网络可视化">
+                    📈 QuantMap
+                </a>
+                <a class="nav-link" href="/quantclaw/ecosystem_visualization_dynamic.html" title="Quant EvoMap 动态生态">
+                    🧬 EvoMap
+                </a>
+                <a class="nav-link" href="/quantmap/docs/whitepaper.html" title="白皮书">
+                    📄 Whitepaper
+                </a>
+                <a class="nav-link active" href="/quantmap/docs/roadmap.html" title="路线图">
+                    🗺️ Roadmap
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="hero">
+            <h1 class="hero-title">🗺️ Roadmap</h1>
+            <p class="hero-subtitle">
+                QuantFlow 的演进路线图 — 从本地原型到去中心化量化策略网络
+            </p>
+        </div>
+
+        <!-- Progress Overview -->
+        <div class="progress-overview">
+            <div class="progress-card">
+                <div class="progress-value">4</div>
+                <div class="progress-label">总阶段</div>
+            </div>
+            <div class="progress-card">
+                <div class="progress-value" style="color: var(--success);">1</div>
+                <div class="progress-label">已完成</div>
+            </div>
+            <div class="progress-card">
+                <div class="progress-value" style="color: var(--primary);">1</div>
+                <div class="progress-label">进行中</div>
+            </div>
+            <div class="progress-card">
+                <div class="progress-value" style="color: var(--warning);">2</div>
+                <div class="progress-label">规划中</div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline">
+            <!-- Phase 1: Foundation -->
+            <div class="timeline-phase">
+                <div class="timeline-marker completed">✓</div>
+                <div class="phase-header">
+                    <h2 class="phase-title">Phase 1: Foundation</h2>
+                    <span class="phase-date">Q4 2025</span>
+                    <span class="phase-status completed">✅ Completed</span>
+                </div>
+                <div class="phase-content">
+                    <p class="phase-description">
+                        建立核心进化引擎和数据结构，实现基本的策略发现和验证流程。
+                    </p>
+                    <div class="milestones">
+                        <div class="milestone">
+                            <div class="milestone-checkbox done">✓</div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Gene Evolution Engine</div>
+                                <div class="milestone-desc">实现策略基因的交叉、变异和选择机制</div>
+                            </div>
+                            <span class="milestone-tag">Core</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox done">✓</div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Autonomous Seed Discovery</div>
+                                <div class="milestone-desc">自动发现初始种子策略（技术指标、价格形态）</div>
+                            </div>
+                            <span class="milestone-tag">Discovery</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox done">✓</div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Backtest Validation</div>
+                                <div class="milestone-desc">集成回测框架，支持 Sharpe、MaxDD 等指标</div>
+                            </div>
+                            <span class="milestone-tag">Validation</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox done">✓</div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">QuantMap Visualization</div>
+                                <div class="milestone-desc">D3.js 力导向图可视化策略进化网络</div>
+                            </div>
+                            <span class="milestone-tag">UI</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 2: Protocol & Multi-Agent -->
+            <div class="timeline-phase">
+                <div class="timeline-marker in-progress">2</div>
+                <div class="phase-header">
+                    <h2 class="phase-title">Phase 2: Protocol & Agents</h2>
+                    <span class="phase-date">Q1 2026</span>
+                    <span class="phase-status in-progress">🔄 In Progress</span>
+                </div>
+                <div class="phase-content">
+                    <p class="phase-description">
+                        标准化 GEP 协议，实现多 Agent 协作架构，支持外部 Agent 接入。
+                    </p>
+                    <div class="milestones">
+                        <div class="milestone">
+                            <div class="milestone-checkbox done">✓</div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">GEP JSON Schema</div>
+                                <div class="milestone-desc">定义 Gene、Capsule、Event、Bounty 的标准化 Schema</div>
+                            </div>
+                            <span class="milestone-tag">Protocol</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox done">✓</div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">API Gateway</div>
+                                <div class="milestone-desc">FastAPI 实现的统一 API 服务</div>
+                            </div>
+                            <span class="milestone-tag">API</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox done">✓</div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Multi-Agent System</div>
+                                <div class="milestone-desc">Miner / Validator / Optimizer Agent 实现</div>
+                            </div>
+                            <span class="milestone-tag">Agent</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox done">✓</div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Bounty System</div>
+                                <div class="milestone-desc">任务发布与认领机制</div>
+                            </div>
+                            <span class="milestone-tag">Incentive</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox pending"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">External Agent SDK</div>
+                                <div class="milestone-desc">提供 Python/JS SDK 供外部 Agent 接入</div>
+                            </div>
+                            <span class="milestone-tag">SDK</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox pending"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Trust & Reputation</div>
+                                <div class="milestone-desc">Agent 信誉评分系统（Bronze/Silver/Gold）</div>
+                            </div>
+                            <span class="milestone-tag">Trust</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 3: Market & Incentives -->
+            <div class="timeline-phase">
+                <div class="timeline-marker upcoming">3</div>
+                <div class="phase-header">
+                    <h2 class="phase-title">Phase 3: Market & Incentives</h2>
+                    <span class="phase-date">Q2 2026</span>
+                    <span class="phase-status upcoming">📋 Planned</span>
+                </div>
+                <div class="phase-content">
+                    <p class="phase-description">
+                        构建策略市场和经济激励系统，实现策略价值的发现和流通。
+                    </p>
+                    <div class="milestones">
+                        <div class="milestone">
+                            <div class="milestone-checkbox pending"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Strategy Marketplace</div>
+                                <div class="milestone-desc">策略订阅和购买市场</div>
+                            </div>
+                            <span class="milestone-tag">Market</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox pending"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Negentropy Rewards</div>
+                                <div class="milestone-desc">基于负熵贡献的奖励分配</div>
+                            </div>
+                            <span class="milestone-tag">Economics</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox pending"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Live Signal Service</div>
+                                <div class="milestone-desc">实时交易信号推送服务</div>
+                            </div>
+                            <span class="milestone-tag">Signal</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox pending"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Performance Tracking</div>
+                                <div class="milestone-desc">策略实盘表现追踪和排行</div>
+                            </div>
+                            <span class="milestone-tag">Analytics</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 4: Decentralization -->
+            <div class="timeline-phase">
+                <div class="timeline-marker future">4</div>
+                <div class="phase-header">
+                    <h2 class="phase-title">Phase 4: Decentralization</h2>
+                    <span class="phase-date">Q3-Q4 2026</span>
+                    <span class="phase-status upcoming">🔮 Vision</span>
+                </div>
+                <div class="phase-content">
+                    <p class="phase-description">
+                        实现完全去中心化的策略进化网络，引入链上治理和跨链支持。
+                    </p>
+                    <div class="milestones">
+                        <div class="milestone">
+                            <div class="milestone-checkbox pending"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">P2P Network</div>
+                                <div class="milestone-desc">Agent 间点对点通信网络</div>
+                            </div>
+                            <span class="milestone-tag">Network</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox pending"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">On-chain Registry</div>
+                                <div class="milestone-desc">链上策略注册和验证记录</div>
+                            </div>
+                            <span class="milestone-tag">Blockchain</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox pending"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Strategy NFT</div>
+                                <div class="milestone-desc">将优质策略铸造为可交易 NFT</div>
+                            </div>
+                            <span class="milestone-tag">NFT</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox pending"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">DAO Governance</div>
+                                <div class="milestone-desc">去中心化治理和参数投票</div>
+                            </div>
+                            <span class="milestone-tag">Governance</span>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-checkbox pending"></div>
+                            <div class="milestone-text">
+                                <div class="milestone-title">Cross-chain Support</div>
+                                <div class="milestone-desc">支持多链资产的统一策略发现</div>
+                            </div>
+                            <span class="milestone-tag">Multi-chain</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vision Section -->
+        <div class="vision-section">
+            <h2 class="vision-title">🌟 Long-term Vision</h2>
+            <p style="text-align: center; color: var(--text-secondary); max-width: 700px; margin: 0 auto;">
+                QuantFlow 的终极目标是成为 AI Agent 时代的量化策略基础设施，
+                让每一个优秀的策略想法都能被发现、验证和传承。
+            </p>
+            <div class="vision-grid">
+                <div class="vision-card">
+                    <div class="vision-card-icon">🌐</div>
+                    <div class="vision-card-title">Global Strategy Network</div>
+                    <div class="vision-card-desc">
+                        连接全球的量化 Agent，形成一个持续进化的策略知识图谱
+                    </div>
+                </div>
+                <div class="vision-card">
+                    <div class="vision-card-icon">🤖</div>
+                    <div class="vision-card-title">Autonomous Finance</div>
+                    <div class="vision-card-desc">
+                        AI Agent 自主管理资产，无需人工干预的 7x24 交易
+                    </div>
+                </div>
+                <div class="vision-card">
+                    <div class="vision-card-icon">🧬</div>
+                    <div class="vision-card-title">Perpetual Evolution</div>
+                    <div class="vision-card-desc">
+                        策略像生物一样持续进化，适应不断变化的市场环境
+                    </div>
+                </div>
+                <div class="vision-card">
+                    <div class="vision-card-icon">💎</div>
+                    <div class="vision-card-title">Value Discovery</div>
+                    <div class="vision-card-desc">
+                        市场机制自动发现和定价策略价值，实现知识资本化
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>QuantFlow Protocol © 2026 | Building the Future of Quantitative Finance</p>
+            <div class="footer-links">
+                <a href="/quantmap/visualization/index.html">QuantMap</a>
+                <a href="/quantmap/docs/whitepaper.html">Whitepaper</a>
+                <a href="https://github.com">GitHub</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "plan_a_alerted": false,
+  "plan_b_alerted": false,
+  "plan_c_alerted": false,
+  "last_alert_time": 0,
+  "last_alert_price": 0,
+  "alert_count": 0
+}

@@ -1,0 +1,97 @@
+[
+  {
+    "id": "g_momentum_rsi",
+    "name": "RSI Momentum",
+    "formula": "RSI(14) < 30",
+    "parameters": {
+      "period": 14,
+      "threshold": 30
+    },
+    "generation": 0,
+    "source": "initial_seed",
+    "created_at": "2026-02-24T16:00:00.000Z",
+    "last_validated": "2026-02-24T08:28:40.295Z",
+    "passed": false,
+    "backtest_score": {
+      "sharpe": 1.2233333333333334,
+      "max_drawdown": -0.20616666666666664,
+      "win_rate": 0.59
+    }
+  },
+  {
+    "id": "g_trend_sma",
+    "name": "SMA Trend Following",
+    "formula": "Close > SMA(20)",
+    "parameters": {
+      "period": 20
+    },
+    "generation": 0,
+    "source": "initial_seed",
+    "created_at": "2026-02-24T16:00:00.000Z",
+    "backtest_score": {
+      "sharpe": 1.3233333333333333,
+      "max_drawdown": -0.15273333333333333,
+      "win_rate": 0.41333333333333333
+    },
+    "last_validated": "2026-02-24T08:28:40.372Z",
+    "passed": false
+  },
+  {
+    "id": "g_meanrev_bb",
+    "name": "Bollinger Mean Reversion",
+    "formula": "Close < BB.lower(20)",
+    "parameters": {
+      "period": 20,
+      "std": 2
+    },
+    "generation": 0,
+    "source": "initial_seed",
+    "created_at": "2026-02-24T16:00:00.000Z",
+    "backtest_score": {
+      "sharpe": -0.006666666666666654,
+      "max_drawdown": -0.35873333333333335,
+      "win_rate": 0.43
+    },
+    "last_validated": "2026-02-24T08:28:40.445Z",
+    "passed": false
+  },
+  {
+    "id": "g_volatility_break",
+    "name": "Volatility Breakout",
+    "formula": "ATR(14) > ATR(14).mean() * 1.5",
+    "parameters": {
+      "period": 14,
+      "multiplier": 1.5
+    },
+    "generation": 0,
+    "source": "initial_seed",
+    "created_at": "2026-02-24T16:00:00.000Z",
+    "backtest_score": {
+      "sharpe": 0.15666666666666665,
+      "max_drawdown": -0.30223333333333335,
+      "win_rate": 0.45
+    },
+    "last_validated": "2026-02-24T08:28:40.517Z",
+    "passed": false
+  },
+  {
+    "id": "g_macd_signal",
+    "name": "MACD Signal",
+    "formula": "MACD.histogram > 0 AND MACD > MACD.signal",
+    "parameters": {
+      "fast": 12,
+      "slow": 26,
+      "signal": 9
+    },
+    "generation": 0,
+    "source": "initial_seed",
+    "created_at": "2026-02-24T16:00:00.000Z",
+    "backtest_score": {
+      "sharpe": 1.0966666666666667,
+      "max_drawdown": -0.1940666666666667,
+      "win_rate": 0.57
+    },
+    "last_validated": "2026-02-24T08:28:40.588Z",
+    "passed": true
+  }
+]

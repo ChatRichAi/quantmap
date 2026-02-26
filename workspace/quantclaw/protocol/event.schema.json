@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quantclaw.local/protocol/event.schema.json",
+  "title": "Quant-GEP Evolution Event",
+  "type": "object",
+  "required": [
+    "event_id",
+    "gene_id",
+    "capsule_id",
+    "event_type",
+    "trigger",
+    "test_data",
+    "gdi_score",
+    "meta"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "gene_id": {
+      "type": "string"
+    },
+    "capsule_id": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "created",
+        "mutated",
+        "tested",
+        "deployed",
+        "daemon_cycle"
+      ]
+    },
+    "trigger": {
+      "type": "string"
+    },
+    "test_data": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "gdi_score": {
+      "type": "number"
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "author",
+        "timestamp"
+      ],
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

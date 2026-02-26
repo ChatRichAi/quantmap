@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantFlow Biology - 生态进化分析</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 1000;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-primary);
+            background: rgba(99, 102, 241, 0.1);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            padding-top: 60px;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Metrics */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .metric-card {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        
+        .metric-card.success { 
+            background: rgba(16, 185, 129, 0.1); 
+            border-color: rgba(16, 185, 129, 0.2); 
+        }
+        .metric-card.warning { 
+            background: rgba(245, 158, 11, 0.1); 
+            border-color: rgba(245, 158, 11, 0.2); 
+        }
+        .metric-card.danger { 
+            background: rgba(239, 68, 68, 0.1); 
+            border-color: rgba(239, 68, 68, 0.2); 
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .metric-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+        
+        .metric-card.full {
+            grid-column: span 2;
+        }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tab-btn {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tab-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--primary);
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        /* Visualization Area */
+        .viz-container {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+        }
+        
+        #viz-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Legend */
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 12px;
+        }
+        
+        .legend-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 6px 0;
+            color: var(--text-primary);
+        }
+        
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        /* Fitness Landscape */
+        .fitness-chart {
+            height: 200px;
+            margin-bottom: 20px;
+        }
+        
+        /* Timeline */
+        .timeline {
+            padding: 12px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .timeline-event {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 12px;
+        }
+        
+        .timeline-event:last-child {
+            border-bottom: none;
+        }
+        
+        .event-time {
+            color: var(--text-secondary);
+            font-size: 10px;
+            min-width: 50px;
+        }
+        
+        .event-type {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .event-type.mutation { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .event-type.crossover { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
+        .event-type.extinction { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .event-type.emergence { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.98);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 100;
+            max-width: 280px;
+        }
+        
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            background: var(--primary);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn.secondary {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+        }
+        
+        /* Red Queen Chart */
+        .pressure-bar {
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+        
+        .pressure-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">
+            <span style="font-size: 24px;">🧬</span>
+            <span class="logo-text">QuantFlow Biology</span>
+        </div>
+        <div class="header-nav">
+            <a class="nav-link" href="/quantmap/visualization/index.html">📈 QuantMap</a>
+            <a class="nav-link" href="/quantclaw/ecosystem_visualization_dynamic.html">🌐 EvoMap</a>
+            <a class="nav-link active" href="/quantclaw/ecosystem_biology.html">🔬 Biology</a>
+            <a class="nav-link" href="/quantmap/docs/whitepaper.html">📄 Whitepaper</a>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <div class="sidebar">
+            <!-- Ecosystem Metrics -->
+            <div class="section-title">🌍 Ecosystem Analytics</div>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="shannon-h">--</div>
+                    <div class="metric-label">Shannon H'</div>
+                </div>
+                <div class="metric-card success">
+                    <div class="metric-value" id="species-richness">--</div>
+                    <div class="metric-label">Richness</div>
+                </div>
+                <div class="metric-card warning">
+                    <div class="metric-value" id="evenness">--</div>
+                    <div class="metric-label">Evenness</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="gini">--</div>
+                    <div class="metric-label">Gini Coef</div>
+                </div>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="phylogeny">Phylogeny</button>
+                <button class="tab-btn" data-tab="fitness">Fitness</button>
+                <button class="tab-btn" data-tab="redqueen">Red Queen</button>
+                <button class="tab-btn" data-tab="negentropy">Negentropy</button>
+                <button class="tab-btn" data-tab="events">Events</button>
+            </div>
+            
+            <!-- Fitness Landscape -->
+            <div id="panel-fitness" class="panel" style="display:none;">
+                <div class="section-title">📈 Fitness Landscape</div>
+                <div class="fitness-chart">
+                    <svg id="fitness-svg" width="100%" height="100%"></svg>
+                </div>
+                <div style="font-size: 11px; color: var(--text-secondary);">
+                    Peak fitness strategies shown on landscape
+                </div>
+            </div>
+            
+            <!-- Red Queen Pressure -->
+            <div id="panel-redqueen" class="panel" style="display:none;">
+                <div class="section-title">👑 Red Queen Pressure</div>
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 12px; margin-bottom: 4px;">Competition Intensity</div>
+                    <div class="pressure-bar">
+                        <div class="pressure-fill" id="competition-bar" style="width: 0%; background: linear-gradient(90deg, var(--success), var(--warning), var(--danger));"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-secondary);">
+                        <span>Low</span>
+                        <span id="competition-value">--</span>
+                        <span>High</span>
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 12px; margin-bottom: 4px;">Adaptation Rate</div>
+                    <div class="pressure-bar">
+                        <div class="pressure-fill" id="adaptation-bar" style="width: 0%; background: var(--primary);"></div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: var(--text-secondary);">
+                    "It takes all the running you can do, to keep in the same place."
+                </div>
+            </div>
+            
+            <!-- Negentropy -->
+            <div id="panel-negentropy" class="panel" style="display:none;">
+                <div class="section-title">⚡ Negentropy</div>
+                <div class="metric-grid">
+                    <div class="metric-card full success">
+                        <div class="metric-value" id="negentropy-saved">--</div>
+                        <div class="metric-label">Compute Saved</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="reuse-count">--</div>
+                        <div class="metric-label">Gene Reuses</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="share-ratio">--</div>
+                        <div class="metric-label">Share Ratio</div>
+                    </div>
+                </div>
+                <div style="font-size: 11px; color: var(--text-secondary); margin-top: 12px;">
+                    Negentropy = Σ(shared × cost) - solo_cost
+                </div>
+            </div>
+            
+            <!-- Macro Events Timeline -->
+            <div id="panel-events" class="panel" style="display:none;">
+                <div class="section-title">🕰️ Macro Events</div>
+                <div class="timeline" id="events-timeline">
+                    <div class="timeline-event">
+                        <span class="event-time">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Phylogeny Info -->
+            <div id="panel-phylogeny" class="panel">
+                <div class="section-title">🌳 Phylogeny Stats</div>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="total-genes">--</div>
+                        <div class="metric-label">Total Genes</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="max-gen">--</div>
+                        <div class="metric-label">Max Gen</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="lineages">--</div>
+                        <div class="metric-label">Lineages</div>
+                    </div>
+                    <div class="metric-card success">
+                        <div class="metric-value" id="survival-rate">--</div>
+                        <div class="metric-label">Survival</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="viz-container">
+            <svg id="viz-canvas"></svg>
+            
+            <div class="legend">
+                <div class="legend-title">Gene Categories</div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #10b981;"></div>
+                    <span>Validated (Sharpe &gt; 1.0)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #6366f1;"></div>
+                    <span>Evolved (Gen &gt; 1)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #f59e0b;"></div>
+                    <span>Seed (Gen 0)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background: #ef4444;"></div>
+                    <span>Retired</span>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn secondary" onclick="resetView()">🔍 Reset</button>
+                <button class="btn" onclick="refreshData()">🔄 Refresh</button>
+            </div>
+            
+            <div class="tooltip" id="tooltip"></div>
+        </div>
+    </div>
+    
+    <script>
+        // API Configuration
+        const API_CANDIDATES = [
+            window.location.origin.replace(':8888', ':8889'),
+            window.location.origin.replace(':8888', ':8891'),
+            'http://localhost:8889'
+        ];
+        let API_BASE = API_CANDIDATES[0];
+        
+        // State
+        let currentTab = 'phylogeny';
+        let ecosystemData = null;
+        let simulation = null;
+        
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTab = btn.dataset.tab;
+                
+                document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+                document.getElementById(`panel-${currentTab}`).style.display = 'block';
+                
+                if (currentTab === 'fitness') renderFitnessLandscape();
+            });
+        });
+        
+        // Fetch data
+        async function fetchData() {
+            for (const candidate of API_CANDIDATES) {
+                try {
+                    const response = await fetch(`${candidate}/api/ecosystem`);
+                    if (!response.ok) continue;
+                    const data = await response.json();
+                    API_BASE = candidate;
+                    return data;
+                } catch (error) {
+                    continue;
+                }
+            }
+            console.error('Failed to fetch data');
+            return null;
+        }
+        
+        // Calculate ecosystem metrics
+        function calculateMetrics(data) {
+            const nodes = data.nodes || [];
+            const links = data.links || [];
+            
+            // Category counts
+            const categories = {};
+            nodes.forEach(n => {
+                const cat = n.status || 'unknown';
+                categories[cat] = (categories[cat] || 0) + 1;
+            });
+            
+            const total = nodes.length;
+            const catValues = Object.values(categories);
+            
+            // Shannon H'
+            let shannonH = 0;
+            catValues.forEach(count => {
+                const p = count / total;
+                if (p > 0) shannonH -= p * Math.log(p);
+            });
+            
+            // Species richness
+            const richness = Object.keys(categories).length;
+            
+            // Evenness (Pielou's J)
+            const maxH = Math.log(richness);
+            const evenness = maxH > 0 ? shannonH / maxH : 0;
+            
+            // Gini coefficient
+            const sorted = catValues.sort((a, b) => a - b);
+            let giniSum = 0;
+            sorted.forEach((val, i) => {
+                giniSum += (2 * (i + 1) - sorted.length - 1) * val;
+            });
+            const gini = sorted.length > 0 ? giniSum / (sorted.length * total) : 0;
+            
+            // Competition intensity (based on similar strategies competing)
+            const formulaCount = {};
+            nodes.forEach(n => {
+                const key = (n.formula || '').substring(0, 20);
+                formulaCount[key] = (formulaCount[key] || 0) + 1;
+            });
+            const maxCompetitors = Math.max(...Object.values(formulaCount), 1);
+            const competitionIntensity = Math.min(maxCompetitors / 10, 1);
+            
+            // Adaptation rate (new genes per generation)
+            const generations = {};
+            nodes.forEach(n => {
+                const gen = n.generation || 0;
+                generations[gen] = (generations[gen] || 0) + 1;
+            });
+            const maxGen = Math.max(...Object.keys(generations).map(Number), 0);
+            const adaptationRate = maxGen > 0 ? total / maxGen : 0;
+            
+            // Negentropy
+            const reuseCount = links.length;
+            const negentropyValue = data.stats?.negentropy_saved_compute || reuseCount * 10;
+            
+            return {
+                shannonH: shannonH.toFixed(2),
+                richness,
+                evenness: evenness.toFixed(2),
+                gini: gini.toFixed(2),
+                totalGenes: total,
+                maxGen,
+                lineages: catValues.filter(v => v > 0).length,
+                survivalRate: nodes.filter(n => n.status === 'validated').length / Math.max(total, 1),
+                competitionIntensity,
+                adaptationRate: (adaptationRate * 10).toFixed(1),
+                negentropyValue,
+                reuseCount,
+                shareRatio: (reuseCount / Math.max(total, 1)).toFixed(2)
+            };
+        }
+        
+        // Update metrics display
+        function updateMetrics(metrics) {
+            document.getElementById('shannon-h').textContent = metrics.shannonH;
+            document.getElementById('species-richness').textContent = metrics.richness;
+            document.getElementById('evenness').textContent = metrics.evenness;
+            document.getElementById('gini').textContent = metrics.gini;
+            
+            document.getElementById('total-genes').textContent = metrics.totalGenes;
+            document.getElementById('max-gen').textContent = metrics.maxGen;
+            document.getElementById('lineages').textContent = metrics.lineages;
+            document.getElementById('survival-rate').textContent = Math.round(metrics.survivalRate * 100) + '%';
+            
+            // Red Queen
+            document.getElementById('competition-bar').style.width = (metrics.competitionIntensity * 100) + '%';
+            document.getElementById('competition-value').textContent = (metrics.competitionIntensity * 100).toFixed(0) + '%';
+            document.getElementById('adaptation-bar').style.width = Math.min(metrics.adaptationRate * 10, 100) + '%';
+            
+            // Negentropy
+            document.getElementById('negentropy-saved').textContent = metrics.negentropyValue;
+            document.getElementById('reuse-count').textContent = metrics.reuseCount;
+            document.getElementById('share-ratio').textContent = metrics.shareRatio;
+        }
+        
+        // Generate mock events
+        function generateEvents(data) {
+            const events = [];
+            const nodes = data.nodes || [];
+            
+            nodes.slice(-10).forEach(n => {
+                if (n.generation > 0) {
+                    events.push({
+                        time: n.created_at ? new Date(n.created_at).toLocaleTimeString() : '--',
+                        type: n.generation > 1 ? 'crossover' : 'mutation',
+                        text: `${n.name} evolved (Gen ${n.generation})`
+                    });
+                }
+            });
+            
+            // Add some emergence events for high performers
+            nodes.filter(n => (n.score || 0) > 1.5).slice(0, 3).forEach(n => {
+                events.push({
+                    time: '--',
+                    type: 'emergence',
+                    text: `${n.name} achieved Sharpe ${(n.score || 0).toFixed(2)}`
+                });
+            });
+            
+            return events.slice(0, 8);
+        }
+        
+        // Update events timeline
+        function updateEvents(events) {
+            const timeline = document.getElementById('events-timeline');
+            if (events.length === 0) {
+                timeline.innerHTML = '<div class="timeline-event"><span style="color: var(--text-secondary);">No events yet</span></div>';
+                return;
+            }
+            
+            timeline.innerHTML = events.map(e => `
+                <div class="timeline-event">
+                    <span class="event-time">${e.time}</span>
+                    <span class="event-type ${e.type}">${e.type}</span>
+                    <span>${e.text}</span>
+                </div>
+            `).join('');
+        }
+        
+        // Render phylogenetic tree
+        function renderPhylogeny(data) {
+            const container = document.getElementById('viz-canvas');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            
+            const svg = d3.select('#viz-canvas')
+                .attr('width', width)
+                .attr('height', height);
+            
+            svg.selectAll('*').remove();
+            
+            const g = svg.append('g');
+            
+            // Zoom
+            const zoom = d3.zoom()
+                .scaleExtent([0.1, 4])
+                .on('zoom', (event) => g.attr('transform', event.transform));
+            svg.call(zoom);
+            
+            const nodes = data.nodes || [];
+            const links = data.links || [];
+            
+            // Filter valid links
+            const nodeIds = new Set(nodes.map(n => n.id));
+            const validLinks = links.filter(l => nodeIds.has(l.source) && nodeIds.has(l.target));
+            
+            // Color scale
+            const colorScale = d => {
+                if (d.status === 'validated' || (d.score || 0) > 1.0) return '#10b981';
+                if ((d.generation || 0) > 1) return '#6366f1';
+                if ((d.generation || 0) === 0) return '#f59e0b';
+                return '#ef4444';
+            };
+            
+            // Force simulation
+            simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(validLinks).id(d => d.id).distance(80))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(30));
+            
+            // Links
+            const link = g.append('g')
+                .selectAll('line')
+                .data(validLinks)
+                .join('line')
+                .attr('stroke', '#475569')
+                .attr('stroke-opacity', 0.4)
+                .attr('stroke-width', d => Math.min(d.shared_count || 1, 3));
+            
+            // Nodes
+            const node = g.append('g')
+                .selectAll('g')
+                .data(nodes)
+                .join('g')
+                .attr('cursor', 'pointer')
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended));
+            
+            node.append('circle')
+                .attr('r', d => 8 + (d.generation || 0) * 2)
+                .attr('fill', colorScale)
+                .attr('stroke', 'rgba(255,255,255,0.2)')
+                .attr('stroke-width', 2);
+            
+            node.append('text')
+                .text(d => d.name ? d.name.substring(0, 12) : d.id.substring(0, 8))
+                .attr('x', 0)
+                .attr('y', d => 14 + (d.generation || 0) * 2)
+                .attr('text-anchor', 'middle')
+                .attr('font-size', '10px')
+                .attr('fill', '#f8fafc');
+            
+            // Tooltip
+            const tooltip = d3.select('#tooltip');
+            
+            node.on('mouseover', function(event, d) {
+                tooltip.style('opacity', 1)
+                    .html(`
+                        <div style="font-weight: 600; margin-bottom: 8px;">${d.name || d.id}</div>
+                        <div style="color: var(--text-secondary);">
+                            <div>Generation: ${d.generation || 0}</div>
+                            <div>Sharpe: ${(d.score || 0).toFixed(2)}</div>
+                            <div>Status: ${d.status || 'unknown'}</div>
+                            ${d.formula ? `<div style="font-family: monospace; margin-top: 8px; font-size: 10px;">${d.formula.substring(0, 50)}...</div>` : ''}
+                        </div>
+                    `)
+                    .style('left', (event.pageX + 10) + 'px')
+                    .style('top', (event.pageY - 10) + 'px');
+            })
+            .on('mouseout', () => tooltip.style('opacity', 0));
+            
+            // Tick
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+                
+                node.attr('transform', d => `translate(${d.x},${d.y})`);
+            });
+            
+            function dragstarted(event, d) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+            
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+            
+            function dragended(event, d) {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+        }
+        
+        // Render fitness landscape
+        function renderFitnessLandscape() {
+            if (!ecosystemData) return;
+            
+            const svg = d3.select('#fitness-svg');
+            const width = 240;
+            const height = 180;
+            
+            svg.attr('viewBox', `0 0 ${width} ${height}`);
+            svg.selectAll('*').remove();
+            
+            const nodes = ecosystemData.nodes || [];
+            const scores = nodes.map(n => n.score || 0).filter(s => s > 0);
+            
+            if (scores.length === 0) {
+                svg.append('text')
+                    .attr('x', width / 2)
+                    .attr('y', height / 2)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', '#94a3b8')
+                    .text('No fitness data');
+                return;
+            }
+            
+            // Create landscape curve
+            const xScale = d3.scaleLinear().domain([0, scores.length - 1]).range([20, width - 20]);
+            const yScale = d3.scaleLinear().domain([0, Math.max(...scores) * 1.2]).range([height - 20, 20]);
+            
+            const sortedScores = [...scores].sort((a, b) => a - b);
+            
+            const line = d3.line()
+                .x((d, i) => xScale(i))
+                .y(d => yScale(d))
+                .curve(d3.curveMonotoneX);
+            
+            // Area fill
+            const area = d3.area()
+                .x((d, i) => xScale(i))
+                .y0(height - 20)
+                .y1(d => yScale(d))
+                .curve(d3.curveMonotoneX);
+            
+            svg.append('path')
+                .datum(sortedScores)
+                .attr('fill', 'rgba(99, 102, 241, 0.2)')
+                .attr('d', area);
+            
+            svg.append('path')
+                .datum(sortedScores)
+                .attr('fill', 'none')
+                .attr('stroke', '#6366f1')
+                .attr('stroke-width', 2)
+                .attr('d', line);
+            
+            // Peak marker
+            const maxScore = Math.max(...scores);
+            const maxIdx = sortedScores.indexOf(maxScore);
+            
+            svg.append('circle')
+                .attr('cx', xScale(maxIdx))
+                .attr('cy', yScale(maxScore))
+                .attr('r', 5)
+                .attr('fill', '#10b981');
+            
+            svg.append('text')
+                .attr('x', xScale(maxIdx))
+                .attr('y', yScale(maxScore) - 10)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#10b981')
+                .attr('font-size', '10px')
+                .text(`Peak: ${maxScore.toFixed(2)}`);
+        }
+        
+        // Reset view
+        function resetView() {
+            d3.select('#viz-canvas').transition().duration(750).call(
+                d3.zoom().transform,
+                d3.zoomIdentity
+            );
+        }
+        
+        // Refresh data
+        async function refreshData() {
+            ecosystemData = await fetchData();
+            if (ecosystemData) {
+                const metrics = calculateMetrics(ecosystemData);
+                updateMetrics(metrics);
+                
+                const events = generateEvents(ecosystemData);
+                updateEvents(events);
+                
+                renderPhylogeny(ecosystemData);
+                
+                if (currentTab === 'fitness') {
+                    renderFitnessLandscape();
+                }
+            }
+        }
+        
+        // Initialize
+        refreshData();
+        
+        // Auto refresh
+        setInterval(refreshData, 30000);
+        
+        // Handle resize
+        window.addEventListener('resize', () => {
+            if (ecosystemData) renderPhylogeny(ecosystemData);
+        });
+    </script>
+</body>
+</html>

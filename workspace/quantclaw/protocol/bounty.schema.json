@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quantclaw.local/protocol/bounty.schema.json",
+  "title": "Quant-GEP Bounty",
+  "type": "object",
+  "required": [
+    "task_id",
+    "title",
+    "task_type",
+    "status",
+    "reward",
+    "criteria",
+    "meta"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "task_type": {
+      "type": "string",
+      "enum": [
+        "strategy_discovery",
+        "strategy_optimization",
+        "strategy_validation",
+        "strategy_migration",
+        "portfolio_construction",
+        "implement_paper",
+        "discover_factor",
+        "optimize_strategy"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "claimed",
+        "validating",
+        "completed",
+        "expired",
+        "pending"
+      ]
+    },
+    "params": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "timeframe": {
+          "type": "string"
+        },
+        "data_range": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "reward": {
+      "type": "object",
+      "required": [
+        "base",
+        "token"
+      ],
+      "properties": {
+        "base": {
+          "type": "number"
+        },
+        "bonus": {
+          "type": "number"
+        },
+        "token": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "criteria": {
+      "type": "object",
+      "properties": {
+        "min_sharpe": {
+          "type": "number"
+        },
+        "min_win_rate": {
+          "type": "number"
+        },
+        "max_drawdown": {
+          "type": "number"
+        },
+        "min_trades": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": true
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "created_by",
+        "created_at"
+      ],
+      "properties": {
+        "created_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deadline": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "priority": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

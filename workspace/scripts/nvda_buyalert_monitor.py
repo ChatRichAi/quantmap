@@ -1,0 +1,389 @@
+#!/usr/bin/env python3
+"""
+NVDA 买入时机监控脚本
+监控三个买入方案:
+A. 回调买入: $170-175 (企稳信号)
+B. 突破买入: $195+ (放量突破)
+C. 极端回调: $150-160 (恐慌买入)
+
+触发后发送买入提醒
+"""
+
+import yfinance as yf
+import pandas as pd
+import numpy as np
+from datetime import datetime
+import json
+import os
+
+STATE_FILE = "/Users/oneday/.openclaw/workspace/memory/nvda_buyalert_state.json"
+
+def load_state():
+    """加载监控状态"""
+    if os.path.exists(STATE_FILE):
+        with open(STATE_FILE, 'r') as f:
+            return json.load(f)
+    return {
+        "plan_a_alerted": False,
+        "plan_b_alerted": False,
+        "plan_c_alerted": False,
+        "last_alert_time": 0,
+        "last_alert_price": 0,
+        "alert_count": 0
+    }
+
+def save_state(state):
+    """保存监控状态"""
+    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
+    with open(STATE_FILE, 'w') as f:
+        json.dump(state, f, indent=2)
+
+def get_nvda_data(period="3mo", interval="1h"):
+    """获取NVDA股票数据"""
+    try:
+        ticker = yf.Ticker("NVDA")
+        df = ticker.history(period=period, interval=interval)
+        return df
+    except Exception as e:
+        print(f"获取NVDA数据失败: {e}")
+        return None
+
+def calculate_indicators(df):
+    """计算技术指标"""
+    # 移动平均线
+    df['MA5'] = df['Close'].rolling(window=5).mean()
+    df['MA10'] = df['Close'].rolling(window=10).mean()
+    df['MA20'] = df['Close'].rolling(window=20).mean()
+    df['MA50'] = df['Close'].rolling(window=50).mean()
+    
+    # 成交量均线
+    df['Volume_MA20'] = df['Volume'].rolling(window=20).mean()
+    
+    # MACD
+    exp1 = df['Close'].ewm(span=12, adjust=False).mean()
+    exp2 = df['Close'].ewm(span=26, adjust=False).mean()
+    df['MACD'] = exp1 - exp2
+    df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
+    df['Histogram'] = df['MACD'] - df['Signal']
+    
+    # RSI
+    delta = df['Close'].diff()
+    gain = delta.where(delta > 0, 0).rolling(14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
+    rs = gain / loss
+    df['RSI'] = 100 - (100 / (1 + rs))
+    
+    # 布林带
+    df['BB_Middle'] = df['Close'].rolling(20).mean()
+    df['BB_Upper'] = df['BB_Middle'] + 2 * df['Close'].rolling(20).std()
+    df['BB_Lower'] = df['BB_Middle'] - 2 * df['Close'].rolling(20).std()
+    
+    return df
+
+def check_plan_a_support(df):
+    """
+    方案A: 回调至支撑位$170-175买入
+    条件:
+    1. 价格跌至$170-175区间
+    2. RSI < 40 (超卖或接近超卖)
+    3. 出现企稳K线(长下影/阳线)
+    4. 缩量止跌或温和放量反弹
+    """
+    if len(df) < 10:
+        return False, {}
+    
+    latest = df.iloc[-1]
+    prev = df.iloc[-2]
+    current_price = latest['Close']
+    
+    # 价格在$170-175区间
+    in_support_zone = 170 <= current_price <= 175
+    
+    # RSI < 40
+    rsi_low = latest['RSI'] < 40
+    
+    # 企稳信号: 长下影线或阳线
+    body = abs(latest['Close'] - latest['Open'])
+    lower_shadow = min(latest['Close'], latest['Open']) - latest['Low']
+    upper_shadow = latest['High'] - max(latest['Close'], latest['Open'])
+    
+    stabilization = (lower_shadow > body * 1.5) or (latest['Close'] > latest['Open'])
+    
+    # 成交量不放大(不是恐慌抛售)
+    volume_normal = latest['Volume'] < latest['Volume_MA20'] * 1.5
+    
+    triggered = in_support_zone and (rsi_low or stabilization) and volume_normal
+    
+    details = {
+        "plan": "A",
+        "name": "回调支撑位买入",
+        "price": round(current_price, 2),
+        "in_zone": in_support_zone,
+        "rsi": round(latest['RSI'], 1),
+        "rsi_low": rsi_low,
+        "stabilization": stabilization,
+        "volume_ok": volume_normal,
+        "triggered": triggered
+    }
+    
+    return triggered, details
+
+def check_plan_b_breakout(df):
+    """
+    方案B: 突破买入 $195+
+    条件:
+    1. 价格突破$195
+    2. 成交量 > 1.3x 均量
+    3. RSI > 50 向上
+    4. MACD金叉或柱状图扩张
+    """
+    if len(df) < 20:
+        return False, {}
+    
+    latest = df.iloc[-1]
+    prev = df.iloc[-2]
+    current_price = latest['Close']
+    
+    # 突破$195
+    breakout = current_price > 195
+    prev_below = prev['Close'] <= 195
+    
+    # 放量
+    volume_surge = latest['Volume'] > latest['Volume_MA20'] * 1.3
+    volume_ratio = latest['Volume'] / latest['Volume_MA20'] if latest['Volume_MA20'] > 0 else 0
+    
+    # RSI向上
+    rsi_rising = latest['RSI'] > 50 and latest['RSI'] > prev['RSI']
+    
+    # MACD信号
+    macd_golden = latest['MACD'] > latest['Signal'] and prev['MACD'] <= prev['Signal']
+    histogram_expanding = latest['Histogram'] > prev['Histogram'] and latest['Histogram'] > 0
+    macd_signal = macd_golden or histogram_expanding
+    
+    # 至少满足突破+放量+(RSI或MACD)
+    triggered = breakout and volume_surge and (rsi_rising or macd_signal)
+    
+    details = {
+        "plan": "B",
+        "name": "突破追涨买入",
+        "price": round(current_price, 2),
+        "breakout": breakout,
+        "volume_ratio": round(volume_ratio, 2),
+        "volume_surge": volume_surge,
+        "rsi": round(latest['RSI'], 1),
+        "rsi_rising": rsi_rising,
+        "macd_golden": macd_golden,
+        "histogram_expanding": histogram_expanding,
+        "triggered": triggered
+    }
+    
+    return triggered, details
+
+def check_plan_c_panic(df):
+    """
+    方案C: 极端回调 $150-160 恐慌买入
+    条件:
+    1. 价格跌至$150-160区间
+    2. RSI < 35 (明显超卖)
+    3. 成交量异常放大(恐慌盘涌出)
+    4. 出现长下影线(抄底盘介入)
+    """
+    if len(df) < 10:
+        return False, {}
+    
+    latest = df.iloc[-1]
+    current_price = latest['Close']
+    
+    # 价格在$150-160区间
+    in_panic_zone = 150 <= current_price <= 160
+    
+    # RSI明显超卖
+    rsi_panic = latest['RSI'] < 35
+    
+    # 成交量放大(恐慌)
+    volume_panic = latest['Volume'] > latest['Volume_MA20'] * 1.5
+    
+    # 长下影线(抄底信号)
+    body = abs(latest['Close'] - latest['Open'])
+    lower_shadow = min(latest['Close'], latest['Open']) - latest['Low']
+    long_shadow = lower_shadow > body * 2
+    
+    triggered = in_panic_zone and rsi_panic and (volume_panic or long_shadow)
+    
+    details = {
+        "plan": "C",
+        "name": "恐慌极端买入",
+        "price": round(current_price, 2),
+        "in_zone": in_panic_zone,
+        "rsi": round(latest['RSI'], 1),
+        "rsi_panic": rsi_panic,
+        "volume_panic": volume_panic,
+        "long_shadow": long_shadow,
+        "triggered": triggered
+    }
+    
+    return triggered, details
+
+def format_alert(plan, details):
+    """格式化提醒消息"""
+    
+    if plan == "A":
+        lines = [
+            "🎯 **NVDA 方案A - 回调支撑位买入信号！**",
+            "",
+            f"📉 **价格**: ${details['price']} (进入$170-175支撑区)",
+            f"📊 **RSI**: {details['rsi']} ({'超卖区' if details['rsi'] < 40 else '接近超卖'})",
+            f"✅ **企稳信号**: {'出现' if details['stabilization'] else '观察中'}",
+            "",
+            "💡 **买入建议**:",
+            "  • 买入区间: $170 - $175",
+            "  • 建议仓位: 30%",
+            "  • 止损位: $165 (跌破支撑)",
+            "  • 目标位: $195 / $212 / $254",
+            "",
+            "⚠️ **注意**: 确认企稳后再介入，避免接飞刀"
+        ]
+    
+    elif plan == "B":
+        lines = [
+            "🚀 **NVDA 方案B - 突破追涨买入信号！**",
+            "",
+            f"📈 **价格**: ${details['price']} (突破$195阻力)",
+            f"📊 **成交量**: {details['volume_ratio']}x 均量 {'✅放量' if details['volume_surge'] else ''}",
+            f"📈 **RSI**: {details['rsi']} ({'向上' if details['rsi_rising'] else '观察'})",
+            f"📉 **MACD**: {'金叉' if details['macd_golden'] else '柱状图扩张' if details['histogram_expanding'] else '多头'}",
+            "",
+            "💡 **买入建议**:",
+            "  • 买入区间: $195 - $200",
+            "  • 建议仓位: 40%",
+            "  • 止损位: $188 (跌破突破位)",
+            "  • 目标位: $212 / $254",
+            "",
+            "✅ **趋势确认**: 放量突破，可顺势追涨"
+        ]
+    
+    elif plan == "C":
+        lines = [
+            "🔥 **NVDA 方案C - 极端恐慌买入信号！**",
+            "",
+            f"📉 **价格**: ${details['price']} (深度回调至$150-160)",
+            f"📊 **RSI**: {details['rsi']} (严重超卖)",
+            f"⚡ **恐慌信号**: {'成交量异常' if details['volume_panic'] else ''} {'长下影线' if details['long_shadow'] else ''}",
+            "",
+            "💡 **买入建议**:",
+            "  • 买入区间: $150 - $160",
+            "  • 建议仓位: 50% (可重仓)",
+            "  • 止损位: $140 (极端情况)",
+            "  • 目标位: $180 / $200 / $254",
+            "",
+            "🎯 **机会型买入**: 长期投资价值极高，适合逆向投资者"
+        ]
+    
+    lines.extend([
+        "",
+        f"⏰ 信号时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        "---",
+        "💡 建议结合大盘环境和个人风险承受能力决策"
+    ])
+    
+    return "\n".join(lines)
+
+def check_and_alert():
+    """主检测函数"""
+    print("=" * 60)
+    print("NVDA 买入时机监控")
+    print(f"运行时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("=" * 60)
+    
+    # 获取数据
+    df = get_nvda_data(period="3mo", interval="1h")
+    if df is None:
+        print("❌ 获取数据失败")
+        return None
+    
+    # 计算指标
+    df = calculate_indicators(df)
+    
+    # 加载状态
+    state = load_state()
+    now_ts = int(datetime.now().timestamp())
+    
+    # 获取当前价格
+    current_price = df.iloc[-1]['Close']
+    latest = df.iloc[-1]
+    
+    print(f"\n当前价格: ${current_price:.2f}")
+    print(f"MA20: ${latest['MA20']:.2f}")
+    print(f"MA50: ${latest['MA50']:.2f}")
+    print(f"RSI: {latest['RSI']:.1f}")
+    print(f"成交量比: {latest['Volume']/latest['Volume_MA20']:.2f}x")
+    print(f"MACD柱状图: {latest['Histogram']:.4f}")
+    
+    # 检测三个方案
+    results = []
+    
+    # 方案A: 回调支撑
+    triggered_a, details_a = check_plan_a_support(df)
+    results.append(("A", triggered_a, details_a))
+    print(f"\n方案A (回调$170-175): {'✅ 触发!' if triggered_a else '❌ 未触发'}")
+    
+    # 方案B: 突破追涨
+    triggered_b, details_b = check_plan_b_breakout(df)
+    results.append(("B", triggered_b, details_b))
+    print(f"方案B (突破$195): {'✅ 触发!' if triggered_b else '❌ 未触发'}")
+    
+    # 方案C: 极端回调
+    triggered_c, details_c = check_plan_c_panic(df)
+    results.append(("C", triggered_c, details_c))
+    print(f"方案C (恐慌$150-160): {'✅ 触发!' if triggered_c else '❌ 未触发'}")
+    
+    # 防重复提醒 (同一方案6小时内不重复)
+    alerts = []
+    for plan, triggered, details in results:
+        alert_key = f"plan_{plan.lower()}_alerted"
+        last_alert = state.get(alert_key, False)
+        time_diff = now_ts - state.get('last_alert_time', 0)
+        
+        if triggered and (not last_alert or time_diff > 6 * 3600):
+            # 更新状态
+            state[alert_key] = True
+            state['last_alert_time'] = now_ts
+            state['last_alert_price'] = current_price
+            state['alert_count'] = state.get('alert_count', 0) + 1
+            
+            # 生成提醒
+            alert_msg = format_alert(plan, details)
+            alerts.append(alert_msg)
+            print(f"\n🚨 方案{plan}提醒已生成!")
+        elif triggered:
+            print(f"\n⚠️ 方案{plan}已触发，但距离上次提醒太近({time_diff//3600}小时)")
+    
+    # 价格离开区间后重置状态
+    if current_price > 180:
+        state['plan_a_alerted'] = False
+    if current_price < 190:
+        state['plan_b_alerted'] = False
+    if current_price > 165:
+        state['plan_c_alerted'] = False
+    
+    save_state(state)
+    
+    # 输出提醒
+    if alerts:
+        full_alert = "\n\n" + "="*60 + "\n\n".join(alerts) + "\n" + "="*60
+        print(full_alert)
+        
+        # 写入提醒文件
+        alert_file = "/Users/oneday/.openclaw/workspace/memory/nvda_buyalert.txt"
+        with open(alert_file, 'w') as f:
+            f.write(full_alert)
+        
+        return full_alert
+    else:
+        print("\n\n📊 暂无买入信号，继续监控...")
+        print("监控区间: $150-160(方案C) | $170-175(方案A) | $195+(方案B)")
+    
+    return None
+
+if __name__ == "__main__":
+    check_and_alert()

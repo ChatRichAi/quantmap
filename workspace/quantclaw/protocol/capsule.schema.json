@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quantclaw.local/protocol/capsule.schema.json",
+  "title": "Quant-GEP Capsule",
+  "type": "object",
+  "required": [
+    "capsule_id",
+    "gene_id",
+    "code",
+    "language",
+    "dependencies",
+    "validation",
+    "meta"
+  ],
+  "properties": {
+    "capsule_id": {
+      "type": "string"
+    },
+    "gene_id": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "default": "python"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": [
+        "tested",
+        "validated",
+        "sharpe_ratio",
+        "max_drawdown",
+        "win_rate"
+      ],
+      "properties": {
+        "tested": {
+          "type": "boolean"
+        },
+        "validated": {
+          "type": "boolean"
+        },
+        "sharpe_ratio": {
+          "type": "number"
+        },
+        "max_drawdown": {
+          "type": "number"
+        },
+        "win_rate": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": true
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "author",
+        "created_at"
+      ],
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://quantclaw.local/protocol/quant-gep-v1.schema.json",
+  "title": "Quant-GEP v1 Envelope",
+  "description": "Shared envelope for Quant EvoMap assets.",
+  "type": "object",
+  "required": [
+    "version",
+    "asset_type",
+    "payload",
+    "meta"
+  ],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "quant-gep-v1"
+    },
+    "asset_type": {
+      "type": "string",
+      "enum": [
+        "gene",
+        "capsule",
+        "event",
+        "bounty"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "source",
+        "created_at"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "trace_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,38 @@
+'use client';
+
+import { useApiQuery } from '@/lib/hooks';
+import { fetchEvents } from '@/lib/api';
+import Skeleton from '@/components/ui/Skeleton';
+import EmptyState from '@/components/ui/EmptyState';
+
+const eventIcons: Record<string, string> = {
+  created: '🧬',
+  mutated: '🔄',
+  tested: '🧪',
+  deployed: '🚀',
+  daemon_cycle: '⚙️',
+};
+
+export default function RecentActivity() {
+  const { data, loading } = useApiQuery(() => fetchEvents(10), []);
+
+  if (loading) return <div className="space-y-3"><Skeleton lines={5} className="h-12 w-full" /></div>;
+  if (!data?.items?.length) return <EmptyState icon="📭" title="暂无进化事件" />;
+
+  return (
+    <div className="space-y-2">
+      {data.items.map((ev) => (
+        <div key={ev.event_id} className="flex items-start gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/8 transition-colors">
+          <span className="text-lg mt-0.5">{eventIcons[ev.event_type] ?? '📌'}</span>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm font-medium text-text-primary truncate">{ev.event_type}</span>
+              <span className="text-xs text-text-secondary whitespace-nowrap">GDI: {ev.gdi_score?.toFixed(1)}</span>
+            </div>
+            <p className="text-xs text-text-secondary truncate">gene: {ev.gene_id}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

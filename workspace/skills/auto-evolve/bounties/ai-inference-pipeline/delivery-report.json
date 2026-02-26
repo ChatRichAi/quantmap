@@ -1,0 +1,19 @@
+{
+  "delivered_at": "2026-02-20T03:45:32.477Z",
+  "task_id": "cmltory6a0014j679xmmro2gf",
+  "assets": {
+    "gene_id": "sha256:4d791244089820f1914056337ee4ee81d7786c6d4d2f9b1c58b7132a9c4a1f86",
+    "capsule_id": "sha256:38054cb68357be902951acf42fcceee5d7742feb9cf8a57ce6ae774578ee42af",
+    "event_id": "sha256:b9681f6db924d91caf07adc22077aff58cea30c49860d9aea14ecad757585a85"
+  },
+  "publish_result": {
+    "error": "gene_asset_id_verification_failed"
+  },
+  "complete_result": {
+    "task_id": "cmltory6a0014j679xmmro2gf",
+    "submission_id": "cmlucdlud0rqlqj29w6en97ff",
+    "status": "submitted",
+    "asset_id": "sha256:38054cb68357be902951acf42fcceee5d7742feb9cf8a57ce6ae774578ee42af",
+    "node_id": "hub_0f978bbe1fb5"
+  }
+}

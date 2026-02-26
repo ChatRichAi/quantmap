@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-02-26T12:01:00+08:00",
+  "market": "crypto",
+  "data_source": "OKX Index Candles",
+  "analysis_timeframe": "1H",
+  "assets": {
+    "BTC-USD": {
+      "price": 68216.80,
+      "change_4h_pct": 0.34,
+      "change_since_08h_pct": 0.34,
+      "sma20": 68523.28,
+      "sma50": 68523.28,
+      "trend": "consolidation",
+      "distance_from_20h_high_pct": -2.54,
+      "recent_high": 69998.20,
+      "recent_low": 67614.30,
+      "price_vs_sma20_pct": -0.45
+    },
+    "ETH-USD": {
+      "price": 2054.51,
+      "change_4h_pct": -0.15,
+      "change_since_08h_pct": -0.15,
+      "sma20": 2068.75,
+      "sma50": 2068.75,
+      "trend": "consolidation",
+      "distance_from_20h_high_pct": -4.33,
+      "recent_high": 2147.47,
+      "recent_low": 2035.04,
+      "price_vs_sma20_pct": -0.69
+    }
+  },
+  "relative_strength": {
+    "ETH_vs_BTC_4h": -0.49
+  },
+  "key_levels": {
+    "BTC": {
+      "resistance": [68500, 69000, 70000],
+      "support": [67600, 67000, 66500]
+    },
+    "ETH": {
+      "resistance": [2070, 2100, 2150],
+      "support": [2035, 2000, 1950]
+    }
+  },
+  "summary": "Both BTC and ETH consolidating after pullback. BTC slightly up +0.34%, ETH slightly down -0.15% over 4h. Both trading below SMA20, indicating short-term consolidation phase.",
+  "previous_checks": [
+    {"timestamp": "2026-02-26T08:01:00+08:00", "btc_price": 67987.50, "eth_price": 2057.54},
+    {"timestamp": "2026-02-26T04:01:00+08:00", "btc_price": 69051.20, "eth_price": 2071.40}
+  ]
+}

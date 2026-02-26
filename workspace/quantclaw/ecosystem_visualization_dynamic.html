@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantClaw Evolution Ecosystem - 实时生态可视化</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 40px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 300;
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #10b981;
+        }
+        
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #e94560;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #8892b0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        #ecosystem-viz {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .tooltip {
+            position: absolute;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.9);
+            border: 1px solid rgba(233, 69, 96, 0.3);
+            border-radius: 8px;
+            font-size: 12px;
+            color: #ccd6f6;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            max-width: 300px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .node:hover {
+            filter: brightness(1.3);
+        }
+        
+        .link {
+            stroke-opacity: 0.4;
+            transition: all 0.3s ease;
+        }
+        
+        .legend {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .legend h4 {
+            font-size: 12px;
+            color: #8892b0;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            font-size: 12px;
+            color: #ccd6f6;
+        }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid #e94560;
+            color: #e94560;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            background: #e94560;
+            color: #fff;
+        }
+        
+        .lang-switch {
+            position: fixed;
+            top: 20px;
+            right: 40px;
+            z-index: 1001;
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid #e94560;
+            color: #e94560;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .lang-btn:hover {
+            background: #e94560;
+            color: #fff;
+        }
+        
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: 10px;
+        }
+
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: #8892b0;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #fff;
+            border-color: #e94560;
+            background: rgba(233, 69, 96, 0.15);
+        }
+
+        .nav-link.active {
+            background: rgba(233, 69, 96, 0.25);
+        }
+        
+        .update-info {
+            position: fixed;
+            top: 80px;
+            right: 40px;
+            font-size: 11px;
+            color: #8892b0;
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switch">
+        <button class="lang-btn" id="lang-toggle" onclick="toggleLanguage()">中文 / EN</button>
+    </div>
+    
+    <div class="header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div>
+                <h1>🧬 <span data-i18n="title">QuantClaw Evolution Ecosystem</span></h1>
+                <div class="live-indicator">
+                    <div class="live-dot"></div>
+                    <span data-i18n="live">LIVE - Auto Refresh</span>
+                </div>
+            </div>
+            <nav class="header-nav">
+                <a class="nav-link" href="/quantmap/visualization/index.html" title="QuantMap 网络可视化">
+                    📈 QuantMap
+                </a>
+                <a class="nav-link active" href="/quantclaw/ecosystem_visualization_dynamic.html" title="Quant EvoMap 动态生态">
+                    🧬 EvoMap
+                </a>
+                <a class="nav-link" href="/quantclaw/ecosystem_biology.html" title="Biology 生态分析">
+                    🔬 Biology
+                </a>
+                <a class="nav-link" href="/quantmap/docs/whitepaper.html" title="QuantFlow 白皮书">
+                    📄 Whitepaper
+                </a>
+                <a class="nav-link" href="/quantmap/docs/roadmap.html" title="QuantFlow 路线图">
+                    🗺️ Roadmap
+                </a>
+            </nav>
+        </div>
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="stat-nodes">-</div>
+                <div class="stat-label" data-i18n="genes">Genes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-links">-</div>
+                <div class="stat-label" data-i18n="relations">Relations</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-lineages">-</div>
+                <div class="stat-label" data-i18n="lineages">Lineages</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-generation">-</div>
+                <div class="stat-label" data-i18n="maxGen">Max Gen</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-negentropy">-</div>
+                <div class="stat-label" data-i18n="negentropy">Negentropy</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-trust">-</div>
+                <div class="stat-label" data-i18n="trust">Trust</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="update-info" id="last-update" data-i18n="waiting">Waiting for data...</div>
+    <svg id="ecosystem-viz"></svg>
+    <div class="tooltip" id="tooltip"></div>
+    
+    <div class="legend">
+        <h4 data-i18n="geneTypes">Gene Types</h4>
+        <div class="legend-item">
+            <div class="legend-dot" style="background: #e94560;"></div>
+            <span data-i18n="strategyG3">Strategy (G3+)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background: #0ea5e9;"></div>
+            <span data-i18n="factorG12">Factor (G1-G2)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background: #10b981;"></div>
+            <span data-i18n="seedG0">Seed (G0)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background: #f59e0b;"></div>
+            <span data-i18n="crossover">Crossover</span>
+        </div>
+        <h4 style="margin-top: 14px;" data-i18n="trustTier">Trust Tier</h4>
+        <div class="legend-item">
+            <div class="legend-dot" style="background: #cd7f32;"></div>
+            <span data-i18n="bronze">Bronze</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background: #c0c0c0;"></div>
+            <span data-i18n="silver">Silver</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background: #ffd700;"></div>
+            <span data-i18n="gold">Gold</span>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button class="btn" onclick="refreshData()">🔄 <span data-i18n="refreshNow">Refresh Now</span></button>
+        <button class="btn" id="pause-btn" onclick="toggleAutoRefresh()">⏸️ <span data-i18n="pause">Pause</span></button>
+    </div>
+
+    <script>
+        // 国际化配置
+        const i18n = {
+            en: {
+                title: 'QuantClaw Evolution Ecosystem',
+                live: 'LIVE - Auto Refresh',
+                genes: 'Genes',
+                relations: 'Relations',
+                lineages: 'Lineages',
+                maxGen: 'Max Gen',
+                negentropy: 'Negentropy',
+                trust: 'Trust',
+                waiting: 'Waiting for data...',
+                geneTypes: 'Gene Types',
+                strategyG3: 'Strategy (G3+)',
+                factorG12: 'Factor (G1-G2)',
+                seedG0: 'Seed (G0)',
+                crossover: 'Crossover',
+                trustTier: 'Trust Tier',
+                bronze: 'Bronze',
+                silver: 'Silver',
+                gold: 'Gold',
+                refreshNow: 'Refresh Now',
+                pause: 'Pause',
+                resume: 'Resume',
+                type: 'Type',
+                generation: 'Generation',
+                formula: 'Formula',
+                lastUpdate: 'Last',
+                diversity: 'Diversity'
+            },
+            zh: {
+                title: 'QuantClaw 进化生态系统',
+                live: '实时 - 自动刷新',
+                genes: '基因数',
+                relations: '关系数',
+                lineages: '血统',
+                maxGen: '最大代数',
+                negentropy: '负熵',
+                trust: '信任度',
+                waiting: '等待数据...',
+                geneTypes: '基因类型',
+                strategyG3: '策略 (G3+)',
+                factorG12: '因子 (G1-G2)',
+                seedG0: '种子 (G0)',
+                crossover: '交叉',
+                trustTier: '信任等级',
+                bronze: '青铜',
+                silver: '白银',
+                gold: '黄金',
+                refreshNow: '立即刷新',
+                pause: '暂停',
+                resume: '继续',
+                type: '类型',
+                generation: '代数',
+                formula: '公式',
+                lastUpdate: '更新',
+                diversity: '多样性'
+            }
+        };
+        
+        let currentLang = localStorage.getItem('quantclaw-lang') || 'en';
+        
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'zh' : 'en';
+            localStorage.setItem('quantclaw-lang', currentLang);
+            applyLanguage();
+        }
+        
+        function applyLanguage() {
+            const langBtn = document.getElementById('lang-toggle');
+            langBtn.textContent = currentLang === 'en' ? '中文' : 'English';
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) {
+                    el.textContent = i18n[currentLang][key];
+                }
+            });
+            
+            document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+        }
+        
+        // 初始化语言
+        document.addEventListener('DOMContentLoaded', applyLanguage);
+        
+        // 配置
+        const API_CANDIDATES = [
+            window.location.origin.replace(':8888', ':8889'),
+            window.location.origin.replace(':8888', ':8891')
+        ];
+        let API_BASE = API_CANDIDATES[0];
+        let autoRefresh = true;
+        let refreshInterval;
+        let simulation;
+        let isFirstLoad = true;
+        let nodePositions = {};  // 缓存节点位置
+        
+        // 初始化SVG
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        
+        const svg = d3.select("#ecosystem-viz")
+            .attr("width", width)
+            .attr("height", height);
+        
+        const g = svg.append("g");
+        
+        // 缩放行为
+        const zoom = d3.zoom()
+            .scaleExtent([0.1, 4])
+            .on("zoom", (event) => {
+                g.attr("transform", event.transform);
+            });
+        
+        svg.call(zoom);
+        
+        // Tooltip
+        const tooltip = d3.select("#tooltip");
+        
+        // 获取数据并渲染
+        function getTrustTier(node) {
+            if (node.generation >= 7) return { name: 'Gold', color: '#ffd700' };
+            if (node.generation >= 3) return { name: 'Silver', color: '#c0c0c0' };
+            return { name: 'Bronze', color: '#cd7f32' };
+        }
+
+        async function fetchData() {
+            for (const candidate of API_CANDIDATES) {
+                try {
+                    const response = await fetch(`${candidate}/api/ecosystem`);
+                    if (!response.ok) continue;
+                    const data = await response.json();
+                    API_BASE = candidate;
+                    return data;
+                } catch (error) {
+                    // Try next candidate port.
+                }
+            }
+            console.error('Failed to fetch data from all API candidates:', API_CANDIDATES);
+            return null;
+        }
+        
+        function render(data) {
+            if (!data || !data.nodes || data.nodes.length === 0) {
+                console.log('No data to render');
+                return;
+            }
+            
+            console.log(`[Render] ${data.nodes.length} nodes, ${data.links.length} links`);
+            
+            // 更新统计
+            document.getElementById('stat-nodes').textContent = data.stats.total_genes;
+            document.getElementById('stat-links').textContent = data.stats.total_links;
+            document.getElementById('stat-lineages').textContent = data.stats.unique_lineages;
+            
+            const maxGen = Math.max(...data.nodes.map(n => n.generation || 0));
+            document.getElementById('stat-generation').textContent = maxGen;
+            document.getElementById('stat-negentropy').textContent = Math.round(data.stats.negentropy_saved_compute || 0);
+            document.getElementById('stat-trust').textContent = Math.round(data.stats.top_agent_score || 0);
+            
+            const t = i18n[currentLang];
+            document.getElementById('last-update').textContent = 
+                `${t.lastUpdate}: ${new Date(data.stats.timestamp).toLocaleTimeString()} | ${t.negentropy}: ${(data.stats.negentropy_saved_compute || 0)} | ${t.diversity}: ${(data.stats.shannon_diversity || 0).toFixed(2)} | ${t.trust}: ${(data.stats.top_agent_score || 0).toFixed(1)}`;
+            
+            // 清除旧元素
+            g.selectAll("*").remove();
+            
+            // 恢复或初始化节点位置
+            data.nodes.forEach((d) => {
+                if (nodePositions[d.id]) {
+                    // 恢复已缓存的位置
+                    d.x = nodePositions[d.id].x;
+                    d.y = nodePositions[d.id].y;
+                    d.fx = nodePositions[d.id].fx;
+                    d.fy = nodePositions[d.id].fy;
+                } else if (!isFirstLoad) {
+                    // 非首次加载的新节点，放在画面中心附近
+                    d.x = width / 2 + (Math.random() - 0.5) * 50;
+                    d.y = height / 2 + (Math.random() - 0.5) * 50;
+                } else {
+                    // 首次加载，从中心展开
+                    d.x = width / 2 + (Math.random() - 0.5) * 100;
+                    d.y = height / 2 + (Math.random() - 0.5) * 100;
+                }
+            });
+            
+            // 创建力导向模拟
+            simulation = d3.forceSimulation(data.nodes)
+                .force("link", d3.forceLink(data.links).id(d => d.id).distance(100))
+                .force("charge", d3.forceManyBody().strength(-400))
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .force("collision", d3.forceCollide().radius(d => d.radius + 15));
+            
+            // 非首次加载时，直接停止模拟，不做任何动画
+            if (!isFirstLoad) {
+                simulation.stop();
+            }
+            
+            // 绘制连线
+            const link = g.append("g")
+                .selectAll("line")
+                .data(data.links)
+                .join("line")
+                .attr("class", "link")
+                .attr("stroke", d => d.type === 'crossover' ? '#f59e0b' : '#64748b')
+                .attr("stroke-width", d => Math.min(1 + (d.shared_count || 1), 6));
+            
+            // 绘制节点
+            const node = g.append("g")
+                .selectAll("g")
+                .data(data.nodes)
+                .join("g")
+                .attr("class", "node")
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended));
+            
+            // 节点圆形
+            node.append("circle")
+                .attr("r", d => d.radius)
+                .attr("fill", d => d.color)
+                .attr("stroke", d => getTrustTier(d).color)
+                .attr("stroke-width", 2)
+                .style("filter", d => d.generation > 5 ? "drop-shadow(0 0 10px " + d.color + ")" : null);
+            
+            // 节点标签
+            node.append("text")
+                .text(d => d.name)
+                .attr("x", 0)
+                .attr("y", d => d.radius + 15)
+                .attr("text-anchor", "middle")
+                .attr("font-size", "10px")
+                .attr("fill", "#ccd6f6");
+            
+            // 悬停事件
+            node.on("mouseover", function(event, d) {
+                const trustTier = getTrustTier(d);
+                const t = i18n[currentLang];
+                const trustName = currentLang === 'zh' 
+                    ? (trustTier.name === 'Gold' ? '黄金' : trustTier.name === 'Silver' ? '白银' : '青铜')
+                    : trustTier.name;
+                tooltip.style("opacity", 1)
+                    .html(`
+                        <strong>${d.name}</strong><br/>
+                        ${t.type}: ${d.type}<br/>
+                        ${t.trust}: ${trustName}<br/>
+                        ${t.generation}: ${d.generation}<br/>
+                        ${t.formula}: ${d.formula || 'N/A'}<br/>
+                        ID: ${d.id.substring(0, 8)}...
+                    `)
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 10) + "px");
+            })
+            .on("mouseout", () => tooltip.style("opacity", 0));
+            
+            // 更新位置
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+                
+                node.attr("transform", d => `translate(${d.x},${d.y})`);
+                
+                // 缓存节点位置
+                data.nodes.forEach(d => {
+                    nodePositions[d.id] = { x: d.x, y: d.y, fx: d.fx, fy: d.fy };
+                });
+            });
+            
+            // 非首次加载：直接用缓存位置渲染，无动画
+            if (!isFirstLoad) {
+                link
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+                node.attr("transform", d => `translate(${d.x},${d.y})`);
+            }
+            
+            // 标记首次加载完成
+            if (isFirstLoad) {
+                isFirstLoad = false;
+            }
+        }
+        
+        // 拖拽函数
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+        
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+        
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+        
+        // 刷新数据
+        async function refreshData() {
+            const data = await fetchData();
+            if (data) render(data);
+        }
+        
+        // 自动刷新开关
+        function toggleAutoRefresh() {
+            autoRefresh = !autoRefresh;
+            const btn = document.getElementById('pause-btn');
+            const t = i18n[currentLang];
+            btn.innerHTML = autoRefresh ? `⏸️ <span data-i18n="pause">${t.pause}</span>` : `▶️ <span data-i18n="resume">${t.resume}</span>`;
+            
+            if (autoRefresh) {
+                startAutoRefresh();
+            } else {
+                clearInterval(refreshInterval);
+            }
+        }
+        
+        // 启动自动刷新
+        function startAutoRefresh() {
+            refreshInterval = setInterval(refreshData, 5000); // 每5秒刷新
+        }
+        
+        // 初始加载
+        refreshData();
+        startAutoRefresh();
+        
+        // 初始缩放以适应视图
+        setTimeout(() => {
+            svg.transition().duration(750).call(
+                zoom.transform,
+                d3.zoomIdentity.translate(0, 0).scale(0.8)
+            );
+        }, 500);
+        
+        // 窗口大小调整
+        window.addEventListener('resize', () => {
+            const newWidth = window.innerWidth;
+            const newHeight = window.innerHeight;
+            svg.attr("width", newWidth).attr("height", newHeight);
+            if (simulation) {
+                simulation.force("center", d3.forceCenter(newWidth / 2, newHeight / 2));
+                simulation.alpha(0.3).restart();
+            }
+        });
+    </script>
+</body>
+</html>

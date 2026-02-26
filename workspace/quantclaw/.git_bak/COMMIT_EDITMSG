@@ -1,0 +1,11 @@
+Initial commit: QuantClaw - Evolutionary Quantitative Trading Framework
+
+Features:
+- Self-driving factor evolution with Darwinian ecosystem
+- Multi-layer architecture (Perception, Cognition, Decision)
+- P2P strategy marketplace
+- Research edition with arXiv integration
+- Community edition for collaborative development
+- Protocol schemas for strategy capsules and events
+
+Co-authored-by: Cursor <cursoragent@cursor.com>

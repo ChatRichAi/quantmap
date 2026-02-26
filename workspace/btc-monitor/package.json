@@ -1,0 +1,9 @@
+{
+  "name": "btc-71k-monitor",
+  "version": "1.0.0",
+  "description": "BTC $71K Breakout Monitor",
+  "main": "monitor.js",
+  "scripts": {
+    "start": "node monitor.js"
+  }
+}
