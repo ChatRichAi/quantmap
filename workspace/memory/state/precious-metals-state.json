@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-02-26T21:01:00+08:00",
+  "market": "precious-metals",
+  "xau": {
+    "price": 5173.15,
+    "change_8h_pct": -0.04
+  },
+  "xag": {
+    "price": 87.16,
+    "change_8h_pct": -0.45
+  },
+  "gold_silver_ratio": 59.35,
+  "ratio_change_8h_pct": 0.41
+}

@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-02-27T21:30:00+08:00",
+  "market": "us_stock",
+  "session": "pre_market_evening",
+  "monitor_type": "tech_signals",
+  "results": {
+    "MSFT": {
+      "price": 401.72,
+      "volume_bullish": false,
+      "divergence": false,
+      "signal": "none"
+    },
+    "AMZN": {
+      "price": 207.92,
+      "volume_bullish": false,
+      "divergence": false,
+      "signal": "none"
+    }
+  },
+  "summary": "no_signals",
+  "notes": "Pre-market evening check — no technical signals detected"
+}

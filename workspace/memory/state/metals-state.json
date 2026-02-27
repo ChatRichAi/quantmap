@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-02-27T21:01:00+08:00",
+  "market": "precious_metals",
+  "currency": "CNY",
+  "unit": "gram",
+  "assets": {
+    "XAU": {
+      "price_cny_per_gram": 5196.30,
+      "price_usd_per_oz_est": 2845,
+      "trend": "consolidating_near_highs",
+      "key_levels_cny": {
+        "support": [5100, 5000],
+        "resistance": [5300, 5400]
+      }
+    },
+    "XAG": {
+      "price_cny_per_gram": 90.42,
+      "price_usd_per_oz_est": 31.40,
+      "trend": "mid_range",
+      "key_levels_cny": {
+        "support": [85, 80],
+        "resistance": [95, 100]
+      }
+    }
+  },
+  "gold_silver_ratio": {
+    "current": 57.47,
+    "interpretation": "neutral",
+    "historical_context": "within_20yr_average"
+  },
+  "next_check": "2026-02-28T09:00:00+08:00"
+}

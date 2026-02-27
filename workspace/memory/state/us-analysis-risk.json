@@ -1,0 +1,186 @@
+{
+  "timestamp": "2025-06-17T10:30:00+08:00",
+  "analyst": "policy",
+  "phase": 1,
+  "symbol": "AMD",
+  "riskScore": {
+    "total": 68,
+    "marketRisk": 18,
+    "concentrationRisk": 15,
+    "volatilityRisk": 19,
+    "macroTailRisk": 16
+  },
+  "riskLevel": "high",
+  "riskBreakdown": {
+    "marketRisk": {
+      "score": 18,
+      "factors": [
+        "AMD与QQQ相关性约0.85，系统性风险显著",
+        "半导体板块对经济周期高度敏感",
+        "AI主题投资热度波动影响估值倍数",
+        "当前纳斯达克处于高估值区间，回调风险累积"
+      ],
+      "trend": "stable"
+    },
+    "concentrationRisk": {
+      "score": 15,
+      "factors": [
+        "单一股票持仓集中度风险",
+        "AI/半导体板块在成长组合中易超配",
+        "与NVDA、AVGO等同向波动，分散效果有限",
+        "机构持仓集中，被动资金流影响大"
+      ],
+      "trend": "increasing"
+    },
+    "volatilityRisk": {
+      "score": 19,
+      "factors": [
+        "AMD历史波动率约45-55%，显著高于大盘",
+        "Beta系数约1.7-2.0，放大市场波动",
+        "期权市场活跃，Gamma squeeze风险存在",
+        "财报前后隐含波动率常飙升至60%+"
+      ],
+      "trend": "stable"
+    },
+    "macroTailRisk": {
+      "score": 16,
+      "factors": [
+        "中美科技脱钩风险持续，出口管制升级可能",
+        "台湾地缘政治风险（台积电代工依赖）",
+        "AI投资周期可能面临调整",
+        "美联储利率政策不确定性影响成长股市盈率"
+      ],
+      "trend": "increasing"
+    }
+  },
+  "riskWarnings": [
+    {
+      "warning": "AMD为典型高Beta成长股，市场回调时跌幅可能达大盘2倍",
+      "severity": "high",
+      "probability": "medium",
+      "mitigationAction": "设置大盘关联止损，当QQQ跌破关键支撑位时减仓"
+    },
+    {
+      "warning": "AI主题投资过热，估值对业绩miss极度敏感",
+      "severity": "high",
+      "probability": "medium",
+      "mitigationAction": "财报前降低仓位至正常水平的50%，或买入保护性看跌期权"
+    },
+    {
+      "warning": "台湾供应链地缘政治风险",
+      "severity": "critical",
+      "probability": "low",
+      "mitigationAction": "监控台海局势新闻，设置事件驱动减仓阈值"
+    },
+    {
+      "warning": "波动性极高，不适合高杠杆操作",
+      "severity": "medium",
+      "probability": "high",
+      "mitigationAction": "限制仓位上限，禁用保证金杠杆，仅用现金持仓"
+    }
+  ],
+  "blackSwanRadar": [
+    {
+      "scenario": "美国对华半导体全面禁售升级",
+      "probability": "low",
+      "impact": "severe",
+      "earlySignals": [
+        "BIS发布新的出口管制规则",
+        "AMD数据中心收入占比异常下降",
+        "管理层下调中国区收入预期"
+      ]
+    },
+    {
+      "scenario": "台湾供应链中断（地缘冲突/自然灾害）",
+      "probability": "very_low",
+      "impact": "catastrophic",
+      "earlySignals": [
+        "台海军事活动升级新闻",
+        "台积电产能预警公告",
+        "芯片交货周期异常延长"
+      ]
+    },
+    {
+      "scenario": "AI投资泡沫破裂，数据中心 capex 断崖式下跌",
+      "probability": "low",
+      "impact": "severe",
+      "earlySignals": [
+        " hyperscaler 财报capex指引下调",
+        "AI服务器库存堆积报告",
+        "AMD MI系列订单取消或推迟"
+      ]
+    },
+    {
+      "scenario": "英特尔/英伟达技术突破挤压AMD份额",
+      "probability": "medium",
+      "impact": "moderate",
+      "earlySignals": [
+        "竞争对手发布革命性产品",
+        "AMD市场份额连续季度下滑",
+        "毛利率承压预警"
+      ]
+    }
+  ],
+  "timingSensitivity": {
+    "urgencyLevel": "this_week",
+    "optimalEntryWindow": "等待FOMC会议纪要公布后(6月18日)或7月财报季前布局",
+    "catalysts": [
+      {
+        "event": "6月OPEX期权到期",
+        "date": "2025-06-20",
+        "expectedImpact": "medium",
+        "direction": "uncertain",
+        "tradingImplication": "关注gamma exposure方向，可能出现pin risk"
+      },
+      {
+        "event": "FOMC利率决议与鲍威尔发布会",
+        "date": "2025-06-18",
+        "expectedImpact": "high",
+        "direction": "uncertain",
+        "tradingImplication": "利率决议前降低风险敞口，公布后根据指引行动"
+      },
+      {
+        "event": "AMD Q2 财报发布（预计7月底）",
+        "date": "2025-07-29",
+        "expectedImpact": "high",
+        "direction": "positive",
+        "tradingImplication": "财报前2周开始降低仓位，IV crush风险高"
+      },
+      {
+        "event": "Computex台北电脑展余波",
+        "date": "2025-06-17",
+        "expectedImpact": "medium",
+        "direction": "positive",
+        "tradingImplication": "关注新品发布消息，可能刺激短期情绪"
+      }
+    ],
+    "avoidPeriods": [
+      "6月18日FOMC决议当天",
+      "6月20日OPEX到期日前后1天",
+      "7月最后一周财报发布前3天"
+    ],
+    "optionsExpiry": {
+      "nearestOPEX": "2025-06-20",
+      "gammaExposure": "positive",
+      "pinRisk": "主要行权价110-120区间存在pin风险，当前股价接近时需警惕"
+    }
+  },
+  "positionConstraints": {
+    "maxSinglePosition": "投资组合的5-8%，激进账户不超过10%",
+    "maxSectorExposure": "半导体板块总敞口不超过组合的25%",
+    "suggestedCashReserve": "持有15-20%现金应对波动",
+    "stopLossGuidance": {
+      "atrBased": "2.5-3x ATR（约8-12%）",
+      "percentBased": "个股止损-12%，组合层面-8%减仓",
+      "structureBased": "跌破关键支撑位100/90美元阶梯减仓"
+    }
+  },
+  "keyFindings": [
+    "AMD总体风险评分68/100，属于高风险高回报标的，需严格控制仓位",
+    "波动率风险(19/25)最高，财报前后IV飙升，需警惕IV crush和gamma风险",
+    "宏观尾部风险呈上升趋势，中美科技脱钩与台湾地缘风险为最大潜在黑天鹅",
+    "6月18日FOMC与6月20日OPEX形成短期风险窗口，建议暂缓新建仓位",
+    "最佳入场窗口为FOMC后至财报前（6月19日-7月15日），避开事件高风险期"
+  ],
+  "overallAssessment": "AMD为高风险高波动成长股，当前处于多重事件敏感期，建议控制仓位在5-8%，设置8-12%止损，优先等待FOMC决议后再评估入场时机。"
+}

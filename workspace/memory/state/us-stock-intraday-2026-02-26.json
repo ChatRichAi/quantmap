@@ -1,0 +1,44 @@
+{
+  "timestamp": "2026-02-26T21:30:00+08:00",
+  "market": "US-stock",
+  "market_open": true,
+  "signals": [
+    {
+      "symbol": "MSFT",
+      "name": "微软",
+      "price": 400.60,
+      "signals": {
+        "bottom_divergence": true,
+        "resonance": {
+          "score": 6,
+          "periods": 3,
+          "strength": "strong",
+          "breakouts": ["15m", "1h", "4h"]
+        }
+      },
+      "indicators": {
+        "rsi": 42.99,
+        "macd_divergence": true
+      }
+    },
+    {
+      "symbol": "AMZN",
+      "name": "亚马逊",
+      "price": 210.64,
+      "signals": {
+        "bottom_divergence": true,
+        "resonance": {
+          "score": 6,
+          "periods": 3,
+          "strength": "strong",
+          "breakouts": ["15m", "1h", "4h"]
+        }
+      },
+      "indicators": {
+        "rsi": 29.95,
+        "macd_divergence": true
+      }
+    }
+  ],
+  "summary": "MSFT and AMZN both showing bottom divergence + strong multi-timeframe resonance at market open"
+}

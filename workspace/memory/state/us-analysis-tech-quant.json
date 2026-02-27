@@ -1,0 +1,119 @@
+{
+  "timestamp": "2025-03-02T04:30:00Z",
+  "analyst": "technical",
+  "phase": 1,
+  "symbol": "AMD",
+  "technicalScore": {
+    "total": 26,
+    "priceStructure": 6,
+    "indicators": 6,
+    "multiTimeframe": 7,
+    "volumeConfirmation": 7
+  },
+  "marketStructure": {
+    "primaryTrend": "bullish",
+    "trendStrength": 6,
+    "structureType": "transitioning",
+    "keyLevels": {
+      "strongResistance": [267.08, 250.0, 240.0],
+      "resistance": [220.0, 210.86, 209.77],
+      "support": [195.0, 185.0, 180.0],
+      "strongSupport": [165.0, 150.0, 140.0]
+    }
+  },
+  "technicalSignals": [
+    {
+      "signal": "价格从52周高点回调约24%，处于中期调整阶段",
+      "type": "bearish",
+      "strength": 7,
+      "timeframe": "daily",
+      "reliability": "high"
+    },
+    {
+      "signal": "200日均线（约140-150区间）提供长期支撑，价格仍位于上方",
+      "type": "bullish",
+      "strength": 6,
+      "timeframe": "daily",
+      "reliability": "high"
+    },
+    {
+      "signal": "Beta=1.95，波动率显著高于市场，适合波段交易",
+      "type": "neutral",
+      "strength": 5,
+      "timeframe": "daily",
+      "reliability": "high"
+    },
+    {
+      "signal": "分析师目标价区间220-365，当前价203.68存在上行空间",
+      "type": "bullish",
+      "strength": 5,
+      "timeframe": "weekly",
+      "reliability": "medium"
+    },
+    {
+      "signal": "近期AI合作消息（Meta、Nutanix）形成催化剂，但价格反应平淡，显示市场谨慎",
+      "type": "neutral",
+      "strength": 4,
+      "timeframe": "daily",
+      "reliability": "medium"
+    }
+  ],
+  "multiTimeframeAlignment": {
+    "weekly": "bullish",
+    "daily": "neutral",
+    "fourHour": "bearish",
+    "alignmentScore": 5,
+    "resonanceLevel": "partial"
+  },
+  "quantFactors": {
+    "momentumRank": 65,
+    "relativeStrength": 6,
+    "volatilityRegime": "high",
+    "volumeTrend": "neutral"
+  },
+  "keyFindings": [
+    "AMD当前处于中期调整阶段，从52周高点267.08回调约24%，价格在200美元附近寻求支撑",
+    "长期趋势仍为多头，周线级别维持上升结构，但日线级别动能减弱",
+    "关键阻力位：220（分析师最低目标价/心理关口）、240（Goldman目标价）、267（52周高点）",
+    "关键支撑位：195（短期支撑）、180-185（密集成交区）、150（200日均线附近）",
+    "Beta=1.95显示高波动性，适合技术型交易者波段操作",
+    "近期AI合作消息（Meta 60亿美元GPU订单、Nutanix合作）未显著推升股价，市场对AI半导体竞争格局存疑",
+    "分析师一致目标价290，隐含42%上行空间，但短期技术面偏空"
+  ],
+  "technicalRisks": [
+    "若跌破195支撑位，可能下探180-185密集成交区",
+    "日线级别动能转弱，MACD可能形成死叉",
+    "半导体板块整体承压（NVDAQ4财报后市场担忧），系统性风险",
+    "波动率处于高位，短期价格可能剧烈波动",
+    "若200日均线（约140-150）失守，长期上升趋势可能逆转"
+  ],
+  "entryZones": [
+    {
+      "zone": "180-195",
+      "type": "aggressive",
+      "invalidation": "收盘跌破175"
+    },
+    {
+      "zone": "195-205",
+      "type": "standard",
+      "invalidation": "收盘跌破190"
+    },
+    {
+      "zone": "165-180",
+      "type": "conservative",
+      "invalidation": "收盘跌破160"
+    }
+  ],
+  "priceData": {
+    "currentPrice": 203.68,
+    "previousClose": 210.86,
+    "dayRange": "201.46-209.77",
+    "fiftyTwoWeekRange": "76.48-267.08",
+    "ytdReturn": -4.89,
+    "oneYearReturn": 94.46,
+    "volume": 34802679,
+    "avgVolume": 35540640,
+    "beta": 1.95,
+    "marketCap": "332.082B"
+  }
+}

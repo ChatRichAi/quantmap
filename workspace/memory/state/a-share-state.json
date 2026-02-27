@@ -1,0 +1,19 @@
+{
+  "last_updated": "2026-02-27T15:31:00+08:00",
+  "market_status": "closed",
+  "trading_day": "2026-02-27",
+  "summary": {
+    "limit_up_count": 75,
+    "limit_down_count": null,
+    "data_source_status": "degraded",
+    "notes": "东财API代理受限，部分数据获取失败"
+  },
+  "indices": {
+    "sh_index": {"close": null, "change_pct": null},
+    "sz_index": {"close": null, "change_pct": null},
+    "cy_index": {"close": null, "change_pct": null},
+    "kc_index": {"close": null, "change_pct": null}
+  },
+  "next_session": "2026-03-02",
+  "next_check": "2026-03-02T09:00:00+08:00"
+}
