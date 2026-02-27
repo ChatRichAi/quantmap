@@ -28,8 +28,8 @@ export default function StatsBar() {
       <div className="flex gap-8">
         {['genes', 'generation', 'avgSharpe'].map((key) => (
           <div key={key} className="text-center">
-            <div className="text-2xl font-bold text-text-primary">-</div>
-            <div className="text-[11px] text-text-secondary uppercase tracking-wide mt-0.5">
+            <div className="text-2xl font-bold font-mono text-white/30">-</div>
+            <div className="text-[10px] text-white/40 uppercase tracking-wider mt-0.5">
               {t(key as any)}
             </div>
           </div>
@@ -50,43 +50,43 @@ export default function StatsBar() {
   return (
     <div className="flex gap-8">
       <div className="text-center">
-        <div className="text-2xl font-bold text-text-primary">
+        <div className="text-2xl font-bold font-mono text-white">
           {stats.total_genes}
         </div>
-        <div className="text-[11px] text-text-secondary uppercase tracking-wide mt-0.5">
+        <div className="text-[10px] text-white/40 uppercase tracking-wider mt-0.5">
           {t('genes')}
         </div>
       </div>
       <div className="text-center">
-        <div className="text-2xl font-bold text-text-primary">
+        <div className="text-2xl font-bold font-mono text-white">
           {stats.max_generation}
         </div>
-        <div className="text-[11px] text-text-secondary uppercase tracking-wide mt-0.5">
+        <div className="text-[10px] text-white/40 uppercase tracking-wider mt-0.5">
           {t('generation')}
         </div>
       </div>
       <div className="text-center">
-        <div className="text-2xl font-bold text-text-primary">
+        <div className="text-2xl font-bold font-mono text-emerald-400">
           {survivalRate}%
         </div>
-        <div className="text-[11px] text-text-secondary uppercase tracking-wide mt-0.5">
+        <div className="text-[10px] text-white/40 uppercase tracking-wider mt-0.5">
           {t('survivalRate')}
         </div>
       </div>
       <div className="text-center">
-        <div className="text-2xl font-bold text-text-primary">
+        <div className="text-2xl font-bold font-mono text-white">
           {formatNumber(stats.avg_sharpe)}
         </div>
-        <div className="text-[11px] text-text-secondary uppercase tracking-wide mt-0.5">
+        <div className="text-[10px] text-white/40 uppercase tracking-wider mt-0.5">
           {t('avgSharpe')}
         </div>
       </div>
       {stats.negentropy_saved_compute !== undefined && (
         <div className="text-center">
-          <div className="text-2xl font-bold text-success">
+          <div className="text-2xl font-bold font-mono text-emerald-400">
             {formatNumber(stats.negentropy_saved_compute)}
           </div>
-          <div className="text-[11px] text-text-secondary uppercase tracking-wide mt-0.5">
+          <div className="text-[10px] text-white/40 uppercase tracking-wider mt-0.5">
             {t('negentropy')}
           </div>
         </div>

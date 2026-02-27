@@ -61,24 +61,24 @@ export default function BountiesPage() {
         ) : (
           <div>
             {items.map((b) => (
-              <div key={b.task_id} className="border-b border-border/50 last:border-0">
+              <div key={b.task_id} className="border-b border-white/[0.04] last:border-0">
                 <button
-                  className="w-full flex items-center gap-4 px-4 py-3 hover:bg-white/5 transition-colors text-left"
+                  className="w-full flex items-center gap-4 px-4 py-3 hover:bg-white/[0.03] transition-all duration-200 text-left"
                   onClick={() => setExpanded(expanded === b.task_id ? null : b.task_id)}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-text-primary truncate">{b.title}</span>
+                      <span className="font-medium text-white truncate">{b.title}</span>
                       <Badge variant={statusVariant(b.status)}>{b.status}</Badge>
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-text-secondary">
+                    <div className="flex items-center gap-4 text-[11px] text-white/40">
                       <span>{taskTypeLabel[b.task_type] ?? b.task_type}</span>
-                      <span className="text-warning">{difficultyStars(b.difficulty)}</span>
-                      <span className="text-success">{b.reward_credits} 积分</span>
+                      <span className="text-amber-400">{difficultyStars(b.difficulty)}</span>
+                      <span className="text-emerald-400">{b.reward_credits} 积分</span>
                       {b.claimed_by && <span>认领者: {b.claimed_by}</span>}
                     </div>
                   </div>
-                  <span className="text-text-secondary">{expanded === b.task_id ? '▲' : '▼'}</span>
+                  <span className={`text-white/30 text-xs transition-transform duration-200 ${expanded === b.task_id ? 'rotate-180' : ''}`}>▼</span>
                 </button>
                 {expanded === b.task_id && <div className="px-4 pb-3"><BountyDetail bounty={b} onRefresh={refetch} /></div>}
               </div>

@@ -23,7 +23,7 @@ export default function GeneDetailPage({ params }: { params: { gene_id: string; 
         }
       />
       {loading && <div className="space-y-4"><Skeleton lines={4} className="h-12 w-full" /></div>}
-      {error && <p className="text-danger text-sm">{error}</p>}
+      {error && <p className="text-red-400 text-sm">{error}</p>}
       {data && <GeneDetail gene={data} />}
     </div>
   );

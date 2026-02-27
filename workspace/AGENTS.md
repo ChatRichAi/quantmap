@@ -44,6 +44,39 @@
 - 加密货币：7x24 小时
 - 贵金属：重点关注 09:00 与 21:00 追踪窗口
 
+## 技能自动加载规则
+
+### 美股分析 → 多Agent流水线（3阶段）
+
+当用户请求美股市场扫描、板块分析或生成投资报告时，触发多Agent流水线：
+
+#### Phase 1: 并行分析（3 analyst 同时 spawn）
+- **technical** → 加载 `skills/us-market-tech-quant/SKILL.md` → 写入 `memory/state/us-analysis-tech-quant.json`
+- **planner** → 加载 `skills/us-market-sector-macro/SKILL.md` → 写入 `memory/state/us-analysis-sector-macro.json`
+- **policy** → 加载 `skills/us-market-risk/SKILL.md` → 写入 `memory/state/us-analysis-risk.json`
+
+#### Phase 2: 交叉对质（3 analyst 再次 spawn，审阅其他人结论）
+- **technical** 审阅 sector-macro + risk → `memory/state/us-analysis-challenge-technical.json`
+- **planner** 审阅 tech-quant + risk → `memory/state/us-analysis-challenge-planner.json`
+- **policy** 审阅 tech-quant + sector-macro → `memory/state/us-analysis-challenge-policy.json`
+- 所有对质使用 `skills/us-market-challenge/SKILL.md`
+
+#### Phase 3: 首席策略师聚合（coordinator）
+- coordinator 加载 `skills/us-market-chief-strategist/SKILL.md`
+- 读取 3 份分析报告 + 3 份对质意见
+- 裁决冲突点（保守偏向）
+- 生成最终 10-section 报告 → `memory/state/us-analysis-final.json`
+
+#### 编排要求
+- Phase 1 三个 analyst 必须并行 spawn，互不依赖
+- Phase 2 必须等 Phase 1 全部完成后再 spawn
+- Phase 3 必须等 Phase 2 全部完成后执行
+- 最终报告遵循评分体系（技术面40 + 基本面30 + 情绪面30）和分级策略框架（激进/稳健/保守）
+
+### A股超短 → `chaoduan-strategy` + `stock-sniper`
+- A股盯盘、竞价分析、超短线交易时加载 `skills/chaoduan-strategy/SKILL.md`
+- A股个股狙击、异动扫描时加载 `skills/stock-sniper/SKILL.md`
+
 ## 风控底线
 
 - 单一建议必须有止损或失效条件

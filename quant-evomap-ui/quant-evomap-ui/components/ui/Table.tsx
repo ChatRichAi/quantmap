@@ -35,9 +35,9 @@ export default function Table<T>({ columns, data, loading, emptyMessage = 'æš‚æ—
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border">
+          <tr className="border-b border-white/[0.06]">
             {columns.map((col) => (
-              <th key={col.key} className={clsx('px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider', col.className)}>
+              <th key={col.key} className={clsx('px-4 py-3 text-left text-[11px] font-semibold text-white/40 uppercase tracking-wider', col.className)}>
                 {col.header}
               </th>
             ))}
@@ -49,12 +49,12 @@ export default function Table<T>({ columns, data, loading, emptyMessage = 'æš‚æ—
               key={rowKey(item)}
               onClick={() => onRowClick?.(item)}
               className={clsx(
-                'border-b border-border/50 transition-colors',
-                onRowClick ? 'cursor-pointer hover:bg-white/5' : ''
+                'border-b border-white/[0.04] transition-all duration-200',
+                onRowClick ? 'cursor-pointer hover:bg-white/[0.03]' : ''
               )}
             >
               {columns.map((col) => (
-                <td key={col.key} className={clsx('px-4 py-3 text-text-primary', col.className)}>
+                <td key={col.key} className={clsx('px-4 py-3 text-white/80', col.className)}>
                   {col.render ? col.render(item) : String((item as Record<string, unknown>)[col.key] ?? 'â€”')}
                 </td>
               ))}

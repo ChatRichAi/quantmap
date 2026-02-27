@@ -18,7 +18,7 @@ export default function LanguageSwitch() {
   return (
     <button
       onClick={switchLocale}
-      className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-bg-card hover:bg-white/5 transition-all text-sm font-medium text-text-secondary hover:text-text-primary"
+      className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/10 transition-all duration-200 text-sm font-medium text-white/60 hover:text-white"
     >
       <span className="text-base">{locale === 'en' ? '🇨🇳' : '🇺🇸'}</span>
       <span>{t('switch')}</span>

@@ -335,10 +335,13 @@ class FactorExtractor:
         return factors
 
 
+_DEFAULT_DB_PATH = "/Users/oneday/.openclaw/workspace/quantclaw/evolution_hub.db"
+
+
 class GenePoolInjector:
     """基因池注入器"""
-    
-    def __init__(self, db_path: str = "evolution_hub.db"):
+
+    def __init__(self, db_path: str = _DEFAULT_DB_PATH):
         self.db_path = db_path
     
     def inject(self, factor: ExtractedFactor, dry_run: bool = False) -> Optional[Gene]:
@@ -429,8 +432,8 @@ class GenePoolInjector:
 
 class ArxivGenePipeline:
     """完整管道: 搜索 → 提取 → 注入"""
-    
-    def __init__(self, db_path: str = "evolution_hub.db"):
+
+    def __init__(self, db_path: str = _DEFAULT_DB_PATH):
         self.api = ArXivAPI()
         self.extractor = FactorExtractor()
         self.injector = GenePoolInjector(db_path)
@@ -522,7 +525,7 @@ def main():
     parser.add_argument('--limit', '-l', type=int, default=50, help='Max papers to search')
     parser.add_argument('--dry-run', '-d', action='store_true', help='Preview only, no injection')
     parser.add_argument('--min-confidence', '-c', type=float, default=0.3, help='Minimum confidence threshold')
-    parser.add_argument('--db', type=str, default='evolution_hub.db', help='Database path')
+    parser.add_argument('--db', type=str, default=_DEFAULT_DB_PATH, help='Database path')
     
     args = parser.parse_args()
     

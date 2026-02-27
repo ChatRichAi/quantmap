@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { useTranslations } from 'next-intl';
 import * as d3 from 'd3';
 import { type EcosystemNode, type EcosystemLink } from '@/lib/api';
@@ -12,12 +12,58 @@ interface ForceGraphProps {
   onNodeClick?: (node: EcosystemNode) => void;
 }
 
-export default function ForceGraph({ nodes, links, onNodeClick }: ForceGraphProps) {
+export interface ForceGraphHandle {
+  focusNode: (nodeId: string) => void;
+}
+
+const ForceGraph = forwardRef<ForceGraphHandle, ForceGraphProps>(function ForceGraph({ nodes, links, onNodeClick }, ref) {
   const t = useTranslations('tooltip');
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+  const simNodesRef = useRef<EcosystemNode[]>([]);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  useImperativeHandle(ref, () => ({
+    focusNode(nodeId: string) {
+      const svgEl = svgRef.current;
+      const zoomBehavior = zoomRef.current;
+      if (!svgEl || !zoomBehavior) return;
+
+      const target = simNodesRef.current.find((n) => n.id === nodeId) as any;
+      if (!target || target.x == null || target.y == null) return;
+
+      const { width, height } = dimensions;
+      const scale = 2;
+      const transform = d3.zoomIdentity
+        .translate(width / 2 - target.x * scale, height / 2 - target.y * scale)
+        .scale(scale);
+
+      d3.select(svgEl)
+        .transition()
+        .duration(750)
+        .call(zoomBehavior.transform, transform);
+
+      // highlight pulse on target node
+      d3.select(svgEl)
+        .selectAll<SVGGElement, EcosystemNode>('g.node')
+        .filter((d) => d.id === nodeId)
+        .select('circle')
+        .transition()
+        .duration(300)
+        .attr('stroke', '#667eea')
+        .attr('stroke-width', 5)
+        .style('filter', 'drop-shadow(0 0 20px rgba(102, 126, 234, 0.8))')
+        .transition()
+        .duration(1500)
+        .attr('stroke', (d) => getTrustTierColor(d.trust_tier || 0))
+        .attr('stroke-width', 2)
+        .style('filter', (d) =>
+          d.score > 1.0 ? 'drop-shadow(0 0 12px rgba(16, 185, 129, 0.5))' : 'drop-shadow(0 0 6px rgba(102, 126, 234, 0.3))'
+        );
+    },
+  }), [dimensions]);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -50,6 +96,8 @@ export default function ForceGraph({ nodes, links, onNodeClick }: ForceGraphProp
       });
 
     svg.call(zoom);
+    zoomRef.current = zoom;
+    simNodesRef.current = nodes;
 
     const nodeMap = new Map(nodes.map((n) => [n.id, n]));
     const validLinks = links.filter(
@@ -77,7 +125,7 @@ export default function ForceGraph({ nodes, links, onNodeClick }: ForceGraphProp
       .data(validLinks)
       .join('line')
       .attr('class', 'link')
-      .attr('stroke', '#475569')
+      .attr('stroke', 'rgba(102, 126, 234, 0.15)')
       .attr('stroke-width', (d) => Math.min(1 + (d.shared_count || 0) * 0.5, 4));
 
     const node = g
@@ -112,7 +160,7 @@ export default function ForceGraph({ nodes, links, onNodeClick }: ForceGraphProp
       .attr('stroke', (d) => getTrustTierColor(d.trust_tier || 0))
       .attr('stroke-width', 2)
       .style('filter', (d) =>
-        d.score > 1.0 ? 'drop-shadow(0 0 10px rgba(16, 185, 129, 0.5))' : null
+        d.score > 1.0 ? 'drop-shadow(0 0 12px rgba(16, 185, 129, 0.5))' : 'drop-shadow(0 0 6px rgba(102, 126, 234, 0.3))'
       );
 
     node
@@ -122,7 +170,7 @@ export default function ForceGraph({ nodes, links, onNodeClick }: ForceGraphProp
       .attr('y', (d) => 15 + d.generation * 3 + 18)
       .attr('text-anchor', 'middle')
       .attr('font-size', '11px')
-      .attr('fill', '#f8fafc')
+      .attr('fill', 'rgba(255, 255, 255, 0.7)')
       .attr('font-weight', '500');
 
     node
@@ -130,30 +178,31 @@ export default function ForceGraph({ nodes, links, onNodeClick }: ForceGraphProp
         if (tooltipRef.current) {
           tooltipRef.current.style.opacity = '1';
           tooltipRef.current.innerHTML = `
-            <div class="font-semibold text-text-primary mb-2 pb-2 border-b border-border">${d.name}</div>
-            <div class="flex justify-between my-1.5 text-text-secondary">
+            <div class="font-semibold text-white mb-2 pb-2 border-b border-white/10">${d.name}</div>
+            <div class="flex justify-between my-1.5 text-white/50">
               <span>${t('formula')}:</span>
-              <span class="text-text-primary font-medium">${d.formula}</span>
+              <span class="text-white/80 font-medium">${d.formula}</span>
             </div>
-            <div class="flex justify-between my-1.5 text-text-secondary">
+            <div class="flex justify-between my-1.5 text-white/50">
               <span>${t('sharpe')}:</span>
-              <span class="font-medium" style="color: ${d.score > 1.0 ? '#10b981' : '#ef4444'}">${formatNumber(d.score)}</span>
+              <span class="font-medium font-mono" style="color: ${d.score > 1.0 ? '#10b981' : '#ef4444'}">${formatNumber(d.score)}</span>
             </div>
-            <div class="flex justify-between my-1.5 text-text-secondary">
+            <div class="flex justify-between my-1.5 text-white/50">
               <span>${t('generation')}:</span>
-              <span class="text-text-primary font-medium">${d.generation}</span>
+              <span class="text-white/80 font-medium">G${d.generation}</span>
             </div>
-            <div class="flex justify-between my-1.5 text-text-secondary">
+            <div class="flex justify-between my-1.5 text-white/50">
               <span>${t('trustTier')}:</span>
-              <span class="text-text-primary font-medium">T${d.trust_tier || 0}</span>
+              <span class="text-white/80 font-medium">T${d.trust_tier || 0}</span>
             </div>
-            <div class="flex justify-between my-1.5 text-text-secondary">
+            <div class="flex justify-between my-1.5 text-white/50">
               <span>${t('status')}:</span>
-              <span class="text-text-primary font-medium">${d.score > 1.0 ? t('passed') : t('failed')}</span>
+              <span class="font-medium" style="color: ${d.score > 1.0 ? '#10b981' : '#ef4444'}">${d.score > 1.0 ? t('passed') : t('failed')}</span>
             </div>
           `;
-          tooltipRef.current.style.left = `${event.pageX + 10}px`;
-          tooltipRef.current.style.top = `${event.pageY - 10}px`;
+          const rect = containerRef.current!.getBoundingClientRect();
+          tooltipRef.current.style.left = `${event.clientX - rect.left + 10}px`;
+          tooltipRef.current.style.top = `${event.clientY - rect.top - 10}px`;
         }
       })
       .on('mouseout', function () {
@@ -208,8 +257,10 @@ export default function ForceGraph({ nodes, links, onNodeClick }: ForceGraphProp
       />
       <div
         ref={tooltipRef}
-        className="absolute bg-bg-dark/95 border border-border rounded-xl p-4 text-[13px] pointer-events-none opacity-0 transition-opacity z-50 min-w-[220px] shadow-2xl"
+        className="absolute glass rounded-xl p-4 text-[13px] pointer-events-none opacity-0 transition-opacity duration-200 z-50 min-w-[220px] shadow-float border border-white/[0.08]"
       />
     </div>
   );
-}
+});
+
+export default ForceGraph;

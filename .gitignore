@@ -67,3 +67,41 @@ workspace/HEARTBEAT.md
 identity/
 devices/
 telegram/
+
+# ===== Node.js 二进制 (内置) =====
+node/
+
+# ===== 运行时会话 / 历史 =====
+agents/*/sessions/
+completions/
+cron/runs/
+cron/jobs.json
+cron/jobs.json.bak
+memory/
+
+# ===== Agent 认证 / 会话 =====
+agents/*/agent/auth.json
+agents/*/agent/auth-profiles.json
+agents/*/sessions/
+agents/*/agent/models.json
+
+# ===== Next.js 构建产物 =====
+.next/
+*.tsbuildinfo
+
+# ===== Git 备份目录 =====
+.git_bak/
+
+# ===== 内存数据库 =====
+memory/
+
+# ===== stock-sniper 输出 =====
+workspace/skills/stock-sniper/output/
+
+# ===== openclaw 运行时配置 (含密钥) =====
+openclaw.json
+quantclaw-config-backup.json
+
+# ===== workspace-planner/policy 运行时 =====
+workspace-planner/.openclaw/
+workspace-policy/.openclaw/

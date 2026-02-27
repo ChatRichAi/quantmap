@@ -1,93 +1,61 @@
 {
   "last_alerts": {},
   "breakout_history": {},
-  "last_check": "2026-02-24 21:31:56",
+  "last_check": "2026-02-26 21:30:23",
   "latest_results": [
     {
       "symbol": "MSFT",
       "name": "\u5fae\u8f6f",
       "timeframes": {
         "15m": {
-          "current_price": 384.52,
-          "has_breakout": false,
-          "breakout_type": null,
-          "details": null,
-          "weight": 1
-        },
-        "1h": {
-          "current_price": 384.52,
-          "has_breakout": false,
-          "breakout_type": null,
-          "details": null,
-          "weight": 2
-        },
-        "4h": {
-          "current_price": 384.52,
-          "has_breakout": false,
-          "breakout_type": null,
-          "details": null,
-          "weight": 3
-        },
-        "1d": {
-          "current_price": 384.47,
-          "has_breakout": false,
-          "breakout_type": null,
-          "details": null,
-          "weight": 4
-        }
-      },
-      "resonance_count": 0,
-      "resonance_score": 0,
-      "signals": [],
-      "resonance_level": "\u25cb \u65e0\u5171\u632f",
-      "should_alert": false
-    },
-    {
-      "symbol": "AMZN",
-      "name": "\u4e9a\u9a6c\u900a",
-      "timeframes": {
-        "15m": {
-          "current_price": 205.29,
+          "current_price": 400.49,
           "has_breakout": true,
           "breakout_type": "\u524d\u9ad8\u7a81\u7834",
           "details": {
             "type": "\u524d\u9ad8\u7a81\u7834",
             "strength": "strong",
-            "price": 205.29,
-            "high_20": 205.32,
+            "price": 400.49,
+            "high_20": 401.47,
             "description": "\u7a81\u783420\u65e5\u9ad8\u70b9"
           },
           "weight": 1
         },
         "1h": {
-          "current_price": 205.29,
-          "has_breakout": false,
-          "breakout_type": null,
-          "details": null,
+          "current_price": 400.49,
+          "has_breakout": true,
+          "breakout_type": "\u524d\u9ad8\u7a81\u7834",
+          "details": {
+            "type": "\u524d\u9ad8\u7a81\u7834",
+            "strength": "strong",
+            "price": 400.49,
+            "high_20": 401.47,
+            "description": "\u7a81\u783420\u65e5\u9ad8\u70b9"
+          },
           "weight": 2
         },
         "4h": {
-          "current_price": 205.29,
+          "current_price": 400.49,
           "has_breakout": true,
-          "breakout_type": "\u591a\u5934\u6392\u5217\u5f62\u6210",
+          "breakout_type": "MA20\u7a81\u7834",
           "details": {
-            "type": "\u591a\u5934\u6392\u5217\u5f62\u6210",
-            "strength": "strong",
-            "price": 205.29,
-            "description": "MA5>MA10>MA20\u591a\u5934\u6392\u5217\u786e\u7acb"
+            "type": "MA20\u7a81\u7834",
+            "strength": "medium",
+            "price": 400.49,
+            "ma20": 397.4,
+            "description": "\u4ef7\u683c\u4e0a\u7834MA20"
           },
           "weight": 3
         },
         "1d": {
-          "current_price": 205.27,
+          "current_price": 400.6,
           "has_breakout": false,
           "breakout_type": null,
           "details": null,
           "weight": 4
         }
       },
-      "resonance_count": 2,
-      "resonance_score": 4,
+      "resonance_count": 3,
+      "resonance_score": 6,
       "signals": [
         {
           "timeframe": "15m",
@@ -95,23 +63,126 @@
           "details": {
             "type": "\u524d\u9ad8\u7a81\u7834",
             "strength": "strong",
-            "price": 205.29,
-            "high_20": 205.32,
+            "price": 400.49,
+            "high_20": 401.47,
+            "description": "\u7a81\u783420\u65e5\u9ad8\u70b9"
+          }
+        },
+        {
+          "timeframe": "1h",
+          "type": "\u524d\u9ad8\u7a81\u7834",
+          "details": {
+            "type": "\u524d\u9ad8\u7a81\u7834",
+            "strength": "strong",
+            "price": 400.49,
+            "high_20": 401.47,
             "description": "\u7a81\u783420\u65e5\u9ad8\u70b9"
           }
         },
         {
           "timeframe": "4h",
-          "type": "\u591a\u5934\u6392\u5217\u5f62\u6210",
+          "type": "MA20\u7a81\u7834",
           "details": {
-            "type": "\u591a\u5934\u6392\u5217\u5f62\u6210",
-            "strength": "strong",
-            "price": 205.29,
-            "description": "MA5>MA10>MA20\u591a\u5934\u6392\u5217\u786e\u7acb"
+            "type": "MA20\u7a81\u7834",
+            "strength": "medium",
+            "price": 400.49,
+            "ma20": 397.4,
+            "description": "\u4ef7\u683c\u4e0a\u7834MA20"
           }
         }
       ],
-      "resonance_level": "\u26a1 \u4e2d\u7b49\u5171\u632f",
+      "resonance_level": "\ud83d\udd25 \u5f3a\u5171\u632f",
+      "should_alert": true
+    },
+    {
+      "symbol": "AMZN",
+      "name": "\u4e9a\u9a6c\u900a",
+      "timeframes": {
+        "15m": {
+          "current_price": 210.66,
+          "has_breakout": true,
+          "breakout_type": "\u524d\u9ad8\u7a81\u7834",
+          "details": {
+            "type": "\u524d\u9ad8\u7a81\u7834",
+            "strength": "strong",
+            "price": 210.66,
+            "high_20": 210.8,
+            "description": "\u7a81\u783420\u65e5\u9ad8\u70b9"
+          },
+          "weight": 1
+        },
+        "1h": {
+          "current_price": 210.66,
+          "has_breakout": true,
+          "breakout_type": "\u524d\u9ad8\u7a81\u7834",
+          "details": {
+            "type": "\u524d\u9ad8\u7a81\u7834",
+            "strength": "strong",
+            "price": 210.66,
+            "high_20": 211.59,
+            "description": "\u7a81\u783420\u65e5\u9ad8\u70b9"
+          },
+          "weight": 2
+        },
+        "4h": {
+          "current_price": 210.66,
+          "has_breakout": true,
+          "breakout_type": "\u524d\u9ad8\u7a81\u7834",
+          "details": {
+            "type": "\u524d\u9ad8\u7a81\u7834",
+            "strength": "strong",
+            "price": 210.66,
+            "high_20": 211.59,
+            "description": "\u7a81\u783420\u65e5\u9ad8\u70b9"
+          },
+          "weight": 3
+        },
+        "1d": {
+          "current_price": 210.64,
+          "has_breakout": false,
+          "breakout_type": null,
+          "details": null,
+          "weight": 4
+        }
+      },
+      "resonance_count": 3,
+      "resonance_score": 6,
+      "signals": [
+        {
+          "timeframe": "15m",
+          "type": "\u524d\u9ad8\u7a81\u7834",
+          "details": {
+            "type": "\u524d\u9ad8\u7a81\u7834",
+            "strength": "strong",
+            "price": 210.66,
+            "high_20": 210.8,
+            "description": "\u7a81\u783420\u65e5\u9ad8\u70b9"
+          }
+        },
+        {
+          "timeframe": "1h",
+          "type": "\u524d\u9ad8\u7a81\u7834",
+          "details": {
+            "type": "\u524d\u9ad8\u7a81\u7834",
+            "strength": "strong",
+            "price": 210.66,
+            "high_20": 211.59,
+            "description": "\u7a81\u783420\u65e5\u9ad8\u70b9"
+          }
+        },
+        {
+          "timeframe": "4h",
+          "type": "\u524d\u9ad8\u7a81\u7834",
+          "details": {
+            "type": "\u524d\u9ad8\u7a81\u7834",
+            "strength": "strong",
+            "price": 210.66,
+            "high_20": 211.59,
+            "description": "\u7a81\u783420\u65e5\u9ad8\u70b9"
+          }
+        }
+      ],
+      "resonance_level": "\ud83d\udd25 \u5f3a\u5171\u632f",
       "should_alert": true
     }
   ]

@@ -35,7 +35,10 @@
     "genes": "基因浏览器",
     "bounties": "赏金任务",
     "agents": "Agent 监控",
-    "marketplace": "策略市场"
+    "marketplace": "策略市场",
+    "onboarding": "接入指南",
+    "cliGuide": "CLI 指南",
+    "pricing": "套餐方案"
   },
   "dashboard": {
     "title": "控制台总览",

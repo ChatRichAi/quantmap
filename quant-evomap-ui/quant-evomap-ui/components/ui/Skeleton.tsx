@@ -12,7 +12,7 @@ export default function Skeleton({ className, lines = 1 }: SkeletonProps) {
         <div
           key={i}
           className={clsx(
-            'rounded animate-pulse bg-white/10',
+            'rounded-lg animate-pulse bg-white/[0.06]',
             i < lines - 1 ? 'mb-2' : '',
             className ?? 'h-4 w-full'
           )}

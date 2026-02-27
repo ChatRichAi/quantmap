@@ -11,7 +11,12 @@ export default function StatsGrid() {
 
   if (ml || bl) return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-      {Array.from({length: 6}).map((_,i) => <div key={i} className="bg-bg-card border border-border rounded-xl p-5"><Skeleton className="h-8 w-24 mb-2" /><Skeleton className="h-4 w-16" /></div>)}
+      {Array.from({length: 6}).map((_,i) => (
+        <div key={i} className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-5">
+          <Skeleton className="h-3 w-16 mb-3" />
+          <Skeleton className="h-8 w-24" />
+        </div>
+      ))}
     </div>
   );
 

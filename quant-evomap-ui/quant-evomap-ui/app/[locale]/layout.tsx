@@ -31,11 +31,11 @@ export default async function LocaleLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="bg-bg-dark text-text-primary min-h-screen">
+      <body className="bg-bg-root text-white min-h-screen antialiased">
         <NextIntlClientProvider messages={messages}>
           <Header />
           <Sidebar />
-          <main className="pt-[70px] ml-[220px] min-h-screen">
+          <main className="pt-[70px] ml-[220px] min-h-screen bg-bg-deep">
             {children}
           </main>
         </NextIntlClientProvider>

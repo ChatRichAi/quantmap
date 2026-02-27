@@ -19,14 +19,14 @@ export default function AgentLeaderboard({ agents, loading }: AgentLeaderboardPr
   return (
     <div>
       {agents.map((agent, i) => (
-        <div key={agent.agent_id} className="flex items-center gap-4 px-4 py-3 border-b border-border/50 hover:bg-white/5 transition-colors">
+        <div key={agent.agent_id} className="flex items-center gap-4 px-4 py-3 border-b border-white/[0.04] hover:bg-white/[0.03] transition-all duration-200">
           <span className="text-xl w-8 text-center">{rankMedal(i)}</span>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className="font-mono text-sm text-text-primary">{agent.agent_id}</span>
+              <span className="font-mono text-sm text-white">{agent.agent_id}</span>
               <Badge variant="primary">{agent.score.toFixed(1)} 分</Badge>
             </div>
-            <div className="flex gap-4 text-xs text-text-secondary">
+            <div className="flex gap-4 text-[11px] text-white/40">
               <span>提交 {agent.submissions}</span>
               <span>通过 {agent.accepted}</span>
               <span>验证 {agent.validations}</span>
@@ -34,8 +34,9 @@ export default function AgentLeaderboard({ agents, loading }: AgentLeaderboardPr
             </div>
           </div>
           <div className="w-24">
-            <div className="h-1.5 bg-border rounded-full overflow-hidden">
-              <div className="h-full bg-primary rounded-full" style={{ width: `${Math.min(100, agent.score)}%` }} />
+            <div className="relative h-1 rounded-full bg-white/10 overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#667eea]/20 to-[#764ba2]/20" />
+              <div className="relative h-full rounded-full bg-gradient-to-r from-[#667eea] to-[#764ba2] shadow-[0_0_8px_rgba(102,126,234,0.4)]" style={{ width: `${Math.min(100, agent.score)}%` }} />
             </div>
           </div>
         </div>

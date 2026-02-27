@@ -35,7 +35,10 @@
     "genes": "Gene Explorer",
     "bounties": "Bounty Board",
     "agents": "Agent Monitor",
-    "marketplace": "Marketplace"
+    "marketplace": "Marketplace",
+    "onboarding": "Agent Guide",
+    "cliGuide": "CLI Guide",
+    "pricing": "Pricing"
   },
   "dashboard": {
     "title": "Dashboard Overview",

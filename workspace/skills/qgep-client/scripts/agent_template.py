@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import threading
 import time
 from typing import Any, Dict, Optional
 
@@ -165,9 +166,23 @@ def run_once(client: QGEPClient) -> bool:
     return False
 
 
+def _heartbeat_loop(client: QGEPClient, interval: int = 900) -> None:
+    """后台线程：每 interval 秒发送一次心跳（默认 15 分钟）。"""
+    while True:
+        time.sleep(interval)
+        try:
+            client.a2a_heartbeat()
+            log.debug("Heartbeat sent.")
+        except Exception as exc:
+            log.warning(f"Heartbeat failed: {exc}")
+
+
 def run_loop(client: QGEPClient, interval: int = 60) -> None:
-    """持续轮询，每隔 interval 秒检查一次新任务。"""
+    """持续轮询，每隔 interval 秒检查一次新任务。心跳在后台线程运行。"""
     log.info(f"Starting QGEP agent loop (hub={client.hub}, agent={client.agent_id}, interval={interval}s)")
+    # 后台心跳线程（每 15 分钟，不阻塞主循环）
+    hb_thread = threading.Thread(target=_heartbeat_loop, args=(client,), daemon=True)
+    hb_thread.start()
     while True:
         try:
             handled = run_once(client)
@@ -201,6 +216,17 @@ def main() -> None:
         return
 
     log.info(f"Connected to Hub: {client.hub}  agent_id: {client.agent_id}")
+
+    # A2A Hello — 注册节点（首次运行获取 claim_code 和初始积分）
+    try:
+        hello_resp = client.a2a_hello()
+        log.info(
+            f"A2A Hello: node_id={hello_resp.get('your_node_id')}  "
+            f"claim_code={hello_resp.get('claim_code')}  "
+            f"credits={hello_resp.get('credit_balance')}"
+        )
+    except Exception as exc:
+        log.warning(f"A2A Hello failed (non-fatal): {exc}")
 
     if args.once:
         run_once(client)

@@ -27,10 +27,10 @@ export default function GeneFilterBar({ search, onSearch, status, onStatus }: Ge
           <button
             key={s.value}
             onClick={() => onStatus(s.value)}
-            className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${
+            className={`px-3 py-1.5 text-xs rounded-lg border transition-all duration-200 ${
               status === s.value
-                ? 'bg-primary/20 border-primary/40 text-text-primary'
-                : 'bg-white/5 border-border text-text-secondary hover:text-text-primary'
+                ? 'bg-[rgba(102,126,234,0.15)] border-[#667eea]/30 text-white shadow-glow-xs'
+                : 'bg-white/[0.03] border-white/[0.08] text-white/50 hover:text-white hover:bg-white/[0.06]'
             }`}
           >
             {s.label}

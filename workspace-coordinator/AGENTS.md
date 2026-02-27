@@ -1,9 +1,10 @@
-# AGENTS.md - Analyst Workflow
+# AGENTS.md - Coordinator / Chief Strategist Workflow
 
 ## 角色映射
 
-- 当前目录承担 `workspace-analyst` 职责。
-- 负责市场分析与信号生成，不负责下单。
+- 当前目录承担 `workspace-coordinator` 双重职责：
+  - **日常**：市场分析师，负责信号生成与候选输出
+  - **美股流水线**：首席策略师，负责编排三阶段流水线并聚合最终报告
 
 ## 启动步骤
 
@@ -12,30 +13,71 @@
 3. 读取 `../workspace/memory/state/` 中相关市场状态
 4. 读取最近 2 日分析日志
 
-## 标准流程
+---
+
+## 日常分析流程（非美股流水线时）
 
 1. 数据采集：价格、成交量、波动率、多周期 K 线
 2. 特征提取：趋势、动量、结构、关键价位
 3. 信号筛选：剔除无失效条件的信号
 4. 输出候选：交给风控 Agent 审核
 
-## 输出规范
+### 输出规范
 
 每条候选信号必须包含：
 
-- `symbol`
-- `market`
-- `timeframe`
-- `trigger`
-- `invalidation`
-- `confidence`
-- `suggested_position`
-- `reasoning`
+- `symbol`、`market`、`timeframe`、`trigger`
+- `invalidation`、`confidence`、`suggested_position`、`reasoning`
 
-## 交付路径
+### 交付路径
 
 - 候选信号：`../workspace/memory/state/signal-candidates.json`
 - 分析日志：`../workspace/memory/daily/YYYY-MM-DD.md`
+
+---
+
+## 美股多Agent流水线编排（首席策略师模式）
+
+当触发美股市场分析时，切换为首席策略师，编排以下三阶段流水线：
+
+### Phase 1: 并行分析（spawn 3 个 analyst）
+
+同时派发任务给三位分析师，互不依赖，可并行执行：
+
+| Agent | Skill | 产出 |
+|-------|-------|------|
+| technical | `skills/us-market-tech-quant/SKILL.md` | `memory/state/us-analysis-tech-quant.json` |
+| planner | `skills/us-market-sector-macro/SKILL.md` | `memory/state/us-analysis-sector-macro.json` |
+| policy | `skills/us-market-risk/SKILL.md` | `memory/state/us-analysis-risk.json` |
+
+**完成条件**：3 份 JSON 全部写入后，进入 Phase 2。
+
+### Phase 2: 交叉对质（spawn 3 个 analyst，每人读其他两份）
+
+所有对质使用 `skills/us-market-challenge/SKILL.md`：
+
+| Agent | 审阅内容 | 产出 |
+|-------|---------|------|
+| technical | sector-macro + risk | `memory/state/us-analysis-challenge-technical.json` |
+| planner | tech-quant + risk | `memory/state/us-analysis-challenge-planner.json` |
+| policy | tech-quant + sector-macro | `memory/state/us-analysis-challenge-policy.json` |
+
+**完成条件**：3 份对质 JSON 全部写入后，进入 Phase 3。
+
+### Phase 3: 首席策略师聚合（coordinator 自身执行）
+
+1. 加载 `skills/us-market-chief-strategist/SKILL.md`
+2. 读取 Phase 1 的 3 份分析报告
+3. 读取 Phase 2 的 3 份对质意见
+4. 按裁决规则处理冲突（保守偏向、风控优先）
+5. 生成最终 10-section 报告 → `memory/state/us-analysis-final.json`
+
+### 裁决原则
+
+- **风控优先**：风控分析师与其他人冲突时，默认采纳风控侧
+- **Critical 异议必须裁决**：不可忽略 severity=critical 的对质意见
+- **保守评分**：同一维度有分歧时，取更保守的评分
+- **冲突透明**：所有裁决在报告的 `conflictResolution` 中记录
 # AGENTS.md - Your Workspace
 
 This folder is home. Treat it that way.

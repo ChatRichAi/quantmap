@@ -50,12 +50,12 @@ export default function CreateBountyModal({ open, onClose, onCreated }: CreateBo
 
   const field = (label: string, node: React.ReactNode) => (
     <div className="mb-4">
-      <label className="block text-xs font-medium text-text-secondary mb-1">{label}</label>
+      <label className="block text-[11px] font-medium text-white/50 mb-1.5">{label}</label>
       {node}
     </div>
   );
 
-  const inputClass = "w-full bg-bg-dark border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-primary";
+  const inputClass = "w-full bg-white/[0.03] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#667eea]/50 focus:shadow-[0_0_20px_rgba(102,126,234,0.15)] transition-all duration-300";
 
   return (
     <Modal open={open} onClose={onClose} title="创建赏金任务" size="lg"
@@ -74,7 +74,7 @@ export default function CreateBountyModal({ open, onClose, onCreated }: CreateBo
         {field('难度 (1-5)', <input type="number" min={1} max={5} className={inputClass} value={form.difficulty} onChange={(e) => setForm({...form, difficulty: Number(e.target.value)})} />)}
       </div>
       {field('截止日期（可选）', <input type="datetime-local" className={inputClass} value={form.deadline} onChange={(e) => setForm({...form, deadline: e.target.value})} />)}
-      {field('要求 (JSON)', <textarea className={`${inputClass} font-mono text-xs`} rows={3} value={form.requirements} onChange={(e) => setForm({...form, requirements: e.target.value})} />)}
+      {field('要求 (JSON)', <textarea className={`${inputClass} font-mono text-[11px]`} rows={3} value={form.requirements} onChange={(e) => setForm({...form, requirements: e.target.value})} />)}
     </Modal>
   );
 }
