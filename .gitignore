@@ -77,7 +77,6 @@ completions/
 cron/runs/
 cron/jobs.json
 cron/jobs.json.bak
-memory/
 
 # ===== Agent 认证 / 会话 =====
 agents/*/agent/auth.json
@@ -92,8 +91,8 @@ agents/*/agent/models.json
 # ===== Git 备份目录 =====
 .git_bak/
 
-# ===== 内存数据库 =====
-memory/
+# ===== 根目录 memory（Agent 内存数据库，非项目数据）=====
+/memory/
 
 # ===== stock-sniper 输出 =====
 workspace/skills/stock-sniper/output/
